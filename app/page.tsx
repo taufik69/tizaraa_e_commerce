@@ -4,7 +4,7 @@ import * as React from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Environment, useGLTF } from "@react-three/drei";
 
-const MODEL_URL = "/covered_car_2k.gltf/covered_car_2k.gltf";
+const MODEL_URL = "models/covered_car_2k.gltf/covered_car_2k.gltf";
 
 function CarModel() {
   const { scene } = useGLTF(MODEL_URL);

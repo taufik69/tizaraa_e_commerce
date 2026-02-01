@@ -12,6 +12,7 @@ export interface Product {
   bundleEligible?: string[];
   category?: string;
   brand?: string;
+  modelUrl?: string;
 }
 
 export interface ProductVariants {
@@ -66,6 +67,7 @@ export const mockProducts: Product[] = [
       'https://images.unsplash.com/photo-1611269154421-4e27233ac5c7?w=800',
       'https://images.unsplash.com/photo-1592078615290-033ee584e267?w=800',
     ],
+    modelUrl: 'models/chair/mid_century_lounge_chair_1k.gltf',
     bundleEligible: ['prod-002', 'prod-003'],
     variants: {
       colors: [
@@ -170,6 +172,7 @@ export const mockProducts: Product[] = [
       'https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=800',
       'https://images.unsplash.com/photo-1631679706909-1844bbd07221?w=800',
     ],
+    modelUrl: 'models/desk/small_wooden_table_01_1k.gltf',
     bundleEligible: ['prod-001', 'prod-003'],
     variants: {
       colors: [
@@ -257,6 +260,7 @@ export const mockProducts: Product[] = [
       'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800',
       'https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=800',
     ],
+    modelUrl:" models/Television/Television_01_1k.gltf",
     bundleEligible: ['prod-001', 'prod-002'],
     variants: {
       colors: [
@@ -332,6 +336,7 @@ export const mockProducts: Product[] = [
       'https://images.unsplash.com/photo-1599669454699-248893623440?w=800',
       'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=800',
     ],
+    modelUrl:" models/headset/boombox_1k.gltf",
     bundleEligible: ['prod-005'],
     variants: {
       colors: [
@@ -409,6 +414,7 @@ export const mockProducts: Product[] = [
       'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800',
       'https://images.unsplash.com/photo-1595225476474-87563907a212?w=800',
     ],
+    modelUrl: 'models/keyboard/CashRegister_01_1k.gltf',
     bundleEligible: ['prod-004'],
     variants: {
       colors: [
