@@ -695,10 +695,10 @@ export default function ProductListingClient({
                               Base price
                             </div>
                           </div>
-                          <button className="px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 group/btn">
+                          {/* <button className="px-4 py-2.5 cursor-pointer bg-gray-900 text-white rounded-lg hover:bg-black-700 transition-colors flex items-center gap-2 group/btn">
                             <ShoppingCart className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
-                            <span className="font-medium">Add</span>
-                          </button>
+                            <span className="font-medium">Add </span>
+                          </button> */}
                         </div>
                       </div>
                     </div>

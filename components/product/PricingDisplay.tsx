@@ -4,6 +4,8 @@
 import React, { useState, useEffect } from "react";
 import { Product } from "@/data/mockData";
 import { calculateProductPrice, validatePromoCode } from "@/data/mockData";
+import { useCart } from "@/features/store/hooks/useCart";
+import { color } from "motion";
 
 interface PricingDisplayProps {
   product: Product;
@@ -22,6 +24,7 @@ export default function PricingDisplay({
   quantity,
   onQuantityChange,
 }: PricingDisplayProps) {
+  // const { addToCart } = useCart();
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState<{
     code: string;
@@ -110,11 +113,27 @@ export default function PricingDisplay({
     setPromoError("");
   };
 
+  const { addToCart } = useCart();
+  const handleAddToCart = async () => {
+    // see all selected item
+    console.log("cart item ");
+    await addToCart({
+      productId: product.id,
+      selectedVariants: {
+        color: selectedVariants.color,
+        material: selectedVariants.material,
+        size: selectedVariants.size,
+      },
+      quantity: quantity,
+    });
+  };
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6 sticky top-4">
       {/* Quantity Selector */}
       <div className="space-y-3">
-        <label className="text-sm font-semibold text-gray-900">Quantity</label>
+        <label className="text-sm font-semibold text-gray-900 mb-1">
+          Quantity
+        </label>
         <div className="flex items-center gap-3">
           <button
             onClick={() => quantity > 1 && onQuantityChange(quantity - 1)}
@@ -344,10 +363,8 @@ export default function PricingDisplay({
 
       {/* Add to Cart Button */}
       <button
-        className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl"
-        onClick={() =>
-          alert("Add to Cart functionality - to be implemented with cart store")
-        }
+        className="w-full py-4 bg-gray-800 hover:bg-gray-700 cursor-pointer text-white font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl"
+        onClick={handleAddToCart}
       >
         Add to Cart
       </button>
