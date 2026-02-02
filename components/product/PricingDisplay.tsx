@@ -118,7 +118,7 @@ export default function PricingDisplay({
         <div className="flex items-center gap-3">
           <button
             onClick={() => quantity > 1 && onQuantityChange(quantity - 1)}
-            className="w-10 h-10 rounded-lg border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-40"
+            className="w-10 h-10 rounded-lg border-2 border-gray-900 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-40 text-black cursor-pointer"
             disabled={quantity <= 1}
           >
             <svg
@@ -145,12 +145,12 @@ export default function PricingDisplay({
               const val = parseInt(e.target.value) || 1;
               onQuantityChange(Math.max(1, Math.min(999, val)));
             }}
-            className="w-20 h-10 text-center text-lg font-semibold border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+            className="w-20 h-10 text-center text-lg cursor-pointer font-semibold border-2 text-black border-gray-900 rounded-lg focus:border-blue-500 focus:outline-none"
           />
 
           <button
             onClick={() => onQuantityChange(quantity + 1)}
-            className="w-10 h-10 rounded-lg border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
+            className="w-10 h-10 rounded-lg border-2 cursor-pointer border-gray-900 text-black flex items-center justify-center hover:bg-gray-50 transition-colors"
           >
             <svg
               className="w-5 h-5"
@@ -308,7 +308,7 @@ export default function PricingDisplay({
               onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
               onKeyPress={(e) => e.key === "Enter" && handleApplyPromo()}
               placeholder="Enter code"
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm uppercase"
+              className="flex-1 px-3 py-2 border border-gray-300 placeholder:text-black text-black rounded-lg focus:outline-none focus:border-blue-500 text-sm uppercase"
             />
             <button
               onClick={handleApplyPromo}
