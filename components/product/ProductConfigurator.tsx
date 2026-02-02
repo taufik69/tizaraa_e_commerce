@@ -199,6 +199,7 @@ export default function ProductConfigurator({
                 selectedColor={selectedColor?.hex}
                 selectedMaterial={selectedMaterial?.id}
                 images={product.images}
+                modelUrl={product.modelUrl}
               />
             </React.Suspense>
 
