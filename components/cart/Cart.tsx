@@ -9,7 +9,7 @@ import SavedForLaterItem from "./SavedForLaterItem";
 import RecentlyViewed from "./RecentlyViewed";
 
 export default function Cart() {
-  const {]]]]]]]]]]
+  const {
     items,
     savedForLater,
     cartCount,
