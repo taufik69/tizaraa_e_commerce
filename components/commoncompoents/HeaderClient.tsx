@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import {
   ShoppingCart,
@@ -12,6 +12,8 @@ import {
   Heart,
   User,
 } from "lucide-react";
+import { useAppSelector } from "@/features/store/hooks/hooks";
+import { selectCartItems } from "@/features/slices/cartSelectors";
 
 type IconName = "Home" | "Package" | "Tag" | "Heart";
 
@@ -29,13 +31,20 @@ const iconMap: Record<IconName, React.ElementType> = {
 };
 
 export default function HeaderClient({
-  cartCount,
   menuItems,
 }: {
-  cartCount: number;
   menuItems: readonly MenuItem[];
 }) {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+
+  // Redux থেকে items আনা
+  const items: any = useAppSelector(selectCartItems);
+
+  // cartCount = total quantity (better than items.length)
+  const cartCount = useMemo(
+    () => items.reduce((sum: any, item: any) => sum + (item.quantity || 0), 0),
+    [items],
+  );
 
   return (
     <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50 shadow-sm">
@@ -70,7 +79,7 @@ export default function HeaderClient({
 
           {/* Right Side Icons */}
           <div className="flex items-center gap-4">
-            {/* User Icon - Desktop */}
+            {/* Profile - Desktop */}
             <Link
               href="/profile"
               className="hidden lg:flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -79,16 +88,17 @@ export default function HeaderClient({
               <User className="w-6 h-6 text-gray-700" />
             </Link>
 
-            {/* Cart Icon with Badge */}
+            {/* Cart Icon with Badge (Redux based) */}
             <Link
               href="/cart"
               className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors group"
               aria-label="Cart"
             >
               <ShoppingCart className="w-6 h-6 text-gray-700 group-hover:text-blue-600 transition-colors" />
+
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg animate-pulse">
-                  {cartCount}
+                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-full min-w-5 h-5 px-1 flex items-center justify-center shadow-lg">
+                  {cartCount > 99 ? "99+" : cartCount}
                 </span>
               )}
             </Link>
@@ -130,7 +140,7 @@ export default function HeaderClient({
               );
             })}
 
-            {/* Profile */}
+            {/* Profile - Mobile */}
             <Link
               href="/profile"
               className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all group"
