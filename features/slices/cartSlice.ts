@@ -1,4 +1,3 @@
-
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { CartItem, PromoCode, mockPromoCodes } from "@/data/mockData";
 import { cartDB } from "@/lib/db/cartDB";
@@ -147,7 +146,7 @@ const cartSlice = createSlice({
   reducers: {
     // Optimistic updates for better UX
     optimisticAddToCart: (state, action: PayloadAction<CartItem>) => {
-      console.log("hi" , action.payload)
+      console.log("hi", action.payload);
       const tempId = Date.now();
       state.items.push({ ...action.payload, id: tempId });
     },

@@ -1,33 +1,50 @@
-// src/components/cart/Cart.tsx
 "use client";
 
 import React, { useState } from "react";
-import { useCart } from "@/features/store/hooks/useCart";
-import { getProductById } from "@/data/mockData";
 import CartItem from "./CartItem";
 import SavedForLaterItem from "./SavedForLaterItem";
 import RecentlyViewed from "./RecentlyViewed";
 
+import { useAppDispatch, useAppSelector } from "@/features/store/hooks/hooks";
+import {
+  clearCart,
+  applyPromo,
+  removePromo,
+} from "@/features/slices/cartSlice";
+
+import {
+  selectCartItems,
+  selectSavedForLater,
+  selectSyncStatus,
+  selectLoading,
+  selectCartDerived,
+} from "@/features/slices/cartSelectors";
+
+import { validatePromoCode } from "@/data/mockData";
+
 export default function Cart() {
+  const dispatch = useAppDispatch();
+
+  // store data
+  const items = useAppSelector(selectCartItems);
+  const savedForLater = useAppSelector(selectSavedForLater);
+  const syncStatus = useAppSelector(selectSyncStatus);
+  const loading = useAppSelector(selectLoading);
+
+  // derived totals (same UI vars)
   const {
-    items,
-    savedForLater,
     cartCount,
     subtotal,
     quantityDiscount,
+    appliedPromoCode,
     promoDiscount,
     total,
     totalSavings,
     lowStockItems,
     bundleDiscounts,
-    appliedPromoCode,
-    loading,
-    syncStatus,
-    applyPromo,
-    removePromo,
-    clearCart,
-  } = useCart();
+  } = useAppSelector(selectCartDerived);
 
+  // local UI state
   const [promoCode, setPromoCode] = useState("");
   const [promoError, setPromoError] = useState("");
   const [isApplyingPromo, setIsApplyingPromo] = useState(false);
@@ -41,12 +58,19 @@ export default function Cart() {
     setIsApplyingPromo(true);
     setPromoError("");
 
-    // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    const result = applyPromo(promoCode);
+    // validate using your existing function (based on current total without promo)
+    const baseForPromo = subtotal - quantityDiscount;
+    const result = validatePromoCode(promoCode, baseForPromo);
 
-    if (result.success) {
+    if (result.valid) {
+      dispatch(
+        applyPromo({
+          code: promoCode.toUpperCase(),
+          discount: result.discount,
+        }),
+      );
       setPromoCode("");
       setPromoError("");
     } else {
@@ -62,7 +86,7 @@ export default function Cart() {
         "Are you sure you want to clear your cart? This action cannot be undone.",
       )
     ) {
-      await clearCart();
+      dispatch(clearCart());
     }
   };
 
@@ -200,7 +224,7 @@ export default function Cart() {
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
               {items.map((item) => (
-                <CartItem key={item.id} item={item} />
+                <CartItem key={item.key} item={item} />
               ))}
             </div>
 
@@ -230,7 +254,7 @@ export default function Cart() {
                       <span className="flex items-center gap-1">
                         Promo: {appliedPromoCode.code}
                         <button
-                          onClick={removePromo}
+                          onClick={() => dispatch(removePromo())}
                           className="text-red-500 hover:text-red-700"
                           title="Remove promo"
                         >
@@ -272,7 +296,7 @@ export default function Cart() {
                         onChange={(e) =>
                           setPromoCode(e.target.value.toUpperCase())
                         }
-                        onKeyPress={(e) =>
+                        onKeyDown={(e) =>
                           e.key === "Enter" && handleApplyPromo()
                         }
                         placeholder="Enter code"
@@ -341,7 +365,7 @@ export default function Cart() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {savedForLater.map((item) => (
-                <SavedForLaterItem key={item.id} item={item} />
+                <SavedForLaterItem key={item.key} item={item} />
               ))}
             </div>
           </div>

@@ -4,8 +4,8 @@
 import React, { useState, useEffect } from "react";
 import { Product } from "@/data/mockData";
 import { calculateProductPrice, validatePromoCode } from "@/data/mockData";
-import { useCart } from "@/features/store/hooks/useCart";
-import { color } from "motion";
+import { useAppDispatch } from "@/features/store/hooks/hooks";
+import { addToCart } from "@/features/slices/cartSlice";
 
 interface PricingDisplayProps {
   product: Product;
@@ -24,7 +24,7 @@ export default function PricingDisplay({
   quantity,
   onQuantityChange,
 }: PricingDisplayProps) {
-  // const { addToCart } = useCart();
+  const dispatch = useAppDispatch();
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState<{
     code: string;
@@ -113,19 +113,22 @@ export default function PricingDisplay({
     setPromoError("");
   };
 
-  const { addToCart } = useCart();
   const handleAddToCart = async () => {
-    // see all selected item
-    console.log("cart item ");
-    await addToCart({
-      productId: product.id,
-      selectedVariants: {
-        color: selectedVariants.color,
-        material: selectedVariants.material,
-        size: selectedVariants.size,
-      },
-      quantity: quantity,
-    });
+    const { variants, ...productWithoutVariant } = product;
+
+    dispatch(
+      addToCart({
+        product: productWithoutVariant,
+        selectedVariants: {
+          color: colorVariant,
+          material: materialVariant,
+          size: sizeVariant,
+        },
+        quantity: quantity,
+        quantityDiscount,
+        quantityDiscountPercent,
+      }),
+    );
   };
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6 sticky top-4">

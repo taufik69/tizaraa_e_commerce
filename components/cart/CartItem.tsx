@@ -3,19 +3,20 @@
 
 import React, { useState } from "react";
 import { CartItem as CartItemType } from "@/data/mockData";
-import { useCart } from "@/features/store/hooks/useCart";
+
 import {
   getProductById,
   getStockLevel,
   getStockMessage,
 } from "@/data/mockData";
+import { removeFromCart, updateQuantity } from "@/features/slices/cartSlice";
+import SavedForLaterItem from "./SavedForLaterItem";
 
 interface CartItemProps {
   item: CartItemType & { id: number };
 }
 
 export default function CartItem({ item }: CartItemProps) {
-  const { updateQuantity, removeFromCart, saveForLater } = useCart();
   const [isUpdating, setIsUpdating] = useState(false);
 
   const product = getProductById(item.productId);
@@ -61,7 +62,7 @@ export default function CartItem({ item }: CartItemProps) {
 
     setIsUpdating(true);
     try {
-      await updateQuantity(item.id, newQuantity);
+      updateQuantity(item.id, newQuantity);
     } catch (error) {
       console.error("Failed to update quantity:", error);
     } finally {
@@ -69,19 +70,19 @@ export default function CartItem({ item }: CartItemProps) {
     }
   };
 
-  const handleRemove = async () => {
+  const handleRemove = () => {
     if (window.confirm("Remove this item from your cart?")) {
       try {
-        await removeFromCart(item.id);
+        removeFromCart(item.id);
       } catch (error) {
         console.error("Failed to remove item:", error);
       }
     }
   };
 
-  const handleSaveForLater = async () => {
+  const handleSaveForLater = () => {
     try {
-      await saveForLater(item.id, item);
+      SavedForLaterItem(item.id, item);
     } catch (error) {
       console.error("Failed to save for later:", error);
     }
