@@ -11,6 +11,7 @@ interface ProductViewer3DProps {
   images: string[];
   modelUrl?: string;
   selectedMaterial?: string;
+  handleSelectedImage?: (image: string, index: number) => void;
 }
 
 // Loading component
@@ -269,6 +270,7 @@ export default function ProductViewer3D({
   selectedMaterial,
   images,
   modelUrl,
+  handleSelectedImage,
 }: ProductViewer3DProps) {
   const [autoRotate, setAutoRotate] = useState(true);
   const [zoom, setZoom] = useState(1);
@@ -582,6 +584,8 @@ export default function ProductViewer3D({
                 key={index}
                 onClick={() => {
                   setCurrentImageIndex(index);
+                  console.log("first masdoih ");
+                  handleSelectedImage?.(image, index);
                   if (modelUrl) {
                     setIsModelView(false);
                   }

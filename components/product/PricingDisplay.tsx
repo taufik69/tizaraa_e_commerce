@@ -20,6 +20,10 @@ interface PricingDisplayProps {
   };
   quantity: number;
   onQuantityChange: (qty: number) => void;
+  selectedImage: {
+    image: string;
+    index: number;
+  };
 }
 
 export default function PricingDisplay({
@@ -27,6 +31,7 @@ export default function PricingDisplay({
   selectedVariants,
   quantity,
   onQuantityChange,
+  selectedImage,
 }: PricingDisplayProps) {
   const dispatch = useAppDispatch();
   const [promoCode, setPromoCode] = useState("");
@@ -137,6 +142,7 @@ export default function PricingDisplay({
         },
         quantity: quantity,
         addedAt: new Date().toISOString(),
+        selectedImage: selectedImage,
       };
 
       // Optimistic update

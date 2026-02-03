@@ -17,10 +17,17 @@ import {
 } from "@/features/slices/cartSlice";
 
 interface CartItemProps {
-  item: CartItemType & { id: number };
+  item: CartItemType & {
+    id: number;
+    selectedImage?: {
+      image: string;
+      index: number;
+    };
+  };
 }
 
 export default function CartItem({ item }: CartItemProps) {
+  console.log("item", item.selectedImage);
   const dispatch = useAppDispatch();
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -114,11 +121,24 @@ export default function CartItem({ item }: CartItemProps) {
       <div className="flex gap-6">
         {/* Product Image */}
         <div className="w-32 h-32 shrink-0 bg-gray-100 rounded-lg overflow-hidden">
-          <img
-            src={product.images[0]}
-            alt={product.name}
-            className="w-full h-full object-cover"
-          />
+          {item?.selectedImage == null ? (
+            <img
+              src={product.images[0]}
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            product.images.map((image, index) =>
+              index === item?.selectedImage?.index ? (
+                <img
+                  key={index}
+                  src={image}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : null,
+            )
+          )}
         </div>
 
         {/* Product Details */}

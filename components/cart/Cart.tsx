@@ -213,7 +213,7 @@ export default function Cart() {
               Add some products to get started!
             </p>
             <a
-              href="/products"
+              href="/"
               className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
             >
               Browse Products

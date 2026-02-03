@@ -41,6 +41,10 @@ export default function ProductConfigurator({
   const [shareUrl, setShareUrl] = useState("");
   const [showShareModal, setShowShareModal] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [selectedImage, setselectedImage] = useState({
+    image: "null",
+    index: 0,
+  });
 
   // Update URL when configuration changes
   useEffect(() => {
@@ -105,6 +109,15 @@ export default function ProductConfigurator({
   const selectedMaterial = product.variants.materials.find(
     (m) => m.id === selectedVariants.material,
   );
+
+  // handle selected image index
+  const handleSelectedImage = (image: string, index: number) => {
+    setselectedImage({
+      image,
+      index,
+    });
+    console.log("index", image, index);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -200,6 +213,7 @@ export default function ProductConfigurator({
                 selectedMaterial={selectedMaterial?.id}
                 images={product.images}
                 modelUrl={product.modelUrl}
+                handleSelectedImage={handleSelectedImage}
               />
             </React.Suspense>
 
@@ -223,6 +237,7 @@ export default function ProductConfigurator({
               selectedVariants={selectedVariants}
               quantity={quantity}
               onQuantityChange={setQuantity}
+              selectedImage={selectedImage}
             />
           </div>
         </div>

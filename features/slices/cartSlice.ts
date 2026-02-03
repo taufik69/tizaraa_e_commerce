@@ -3,7 +3,7 @@ import { CartItem, PromoCode, mockPromoCodes } from "@/data/mockData";
 import { cartDB } from "@/lib/db/cartDB";
 import { calculateProductPrice, getProductById } from "@/data/mockData";
 
-import { SucessToast } from "@/helpers/toast";
+import { SucessToast, UpdateToast } from "@/helpers/toast";
 
 interface CartState {
   items: (CartItem & { id: number })[];
@@ -47,6 +47,7 @@ export const addToCartAsync = createAsyncThunk(
   "cart/addToCart",
   async (item: CartItem, { rejectWithValue }) => {
     try {
+      // console.log("item", item);
       const id = await cartDB.addToCart(item);
       SucessToast("Add To Cart Sucessfullly");
       return { ...item, id };
@@ -63,8 +64,8 @@ export const updateCartItemAsync = createAsyncThunk(
     { rejectWithValue },
   ) => {
     try {
-      console.log(id, updates);
       await cartDB.updateCartItem(id, updates);
+      UpdateToast("Cart Updated Sucessfully");
       return { id, updates };
     } catch (error) {
       return rejectWithValue("Failed to update cart item");
