@@ -1,14 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect, useCallback } from "react";
-import {
-  Search,
-  SlidersHorizontal,
-  Star,
-  ShoppingCart,
-  Eye,
-  X,
-} from "lucide-react";
+import { Search, SlidersHorizontal, Star, Eye, X } from "lucide-react";
 import type { Product } from "@/data/mockData";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -289,54 +282,6 @@ export default function ProductListingClient({
   return (
     <>
       {/* Header */}
-      <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between gap-4">
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 text  rounded-lg flex items-center justify-center">
-                <ShoppingCart className="w-6 h-6 text-black" />
-              </div>
-              <h1 className="text-2xl font-bold  text-black bg-clip-text ">
-                Tizaraa E-commerce
-              </h1>
-            </div>
-
-            {/* Search Bar */}
-            <div className="flex-1 max-w-2xl">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border text-black  border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => {
-                      setSearchQuery("");
-                      setDebouncedSearch("");
-                    }}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 hover:bg-gray-100 rounded-full p-1"
-                  >
-                    <X className="w-5 h-5 text-gray-400 hover:text-gray-600" />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Mobile Filter Toggle */}
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <SlidersHorizontal className="w-6 h-6" />
-            </button>
-          </div>
-        </div>
-      </header>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex gap-8">
@@ -551,6 +496,30 @@ export default function ProductListingClient({
                   {filteredAndSortedProducts.length === 1
                     ? "product"
                     : "products"}
+                </div>
+                {/* Search Bar */}
+                <div className="flex-1 max-w-2xl">
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search products..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-12 pr-4 py-3 bg-gray-50 border text-black  border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => {
+                          setSearchQuery("");
+                          setDebouncedSearch("");
+                        }}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 hover:bg-gray-100 rounded-full p-1"
+                      >
+                        <X className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <label className="text-sm text-gray-600">Sort by:</label>
