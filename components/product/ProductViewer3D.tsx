@@ -50,24 +50,32 @@ function Model({
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const { scene } = useGLTF(url);
-  const clonedScene = scene.clone();
 
-  // Apply color to all meshes in the model
+  const clonedScene = React.useMemo(() => scene.clone(true), [scene]);
+
   useEffect(() => {
     if (!selectedColor) return;
 
     clonedScene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        if (child.material) {
-          const material = child.material.clone() as THREE.MeshStandardMaterial;
-          material.color = new THREE.Color(selectedColor);
-          child.material = material;
+        const mat = child.material;
+
+        // multiple materials support
+        if (Array.isArray(mat)) {
+          child.material = mat.map((m) => {
+            const m2 = m.clone() as THREE.MeshStandardMaterial;
+            if ("color" in m2) m2.color = new THREE.Color(selectedColor);
+            return m2;
+          });
+        } else if (mat) {
+          const m2 = mat.clone() as THREE.MeshStandardMaterial;
+          if ("color" in m2) m2.color = new THREE.Color(selectedColor);
+          child.material = m2;
         }
       }
     });
   }, [selectedColor, clonedScene]);
 
-  // Auto rotate
   useFrame((_, delta) => {
     if (groupRef.current && autoRotate) {
       groupRef.current.rotation.y += delta * 0.5;
@@ -78,7 +86,7 @@ function Model({
     <primitive
       ref={groupRef}
       object={clonedScene}
-      scale={1.5}
+      scale={2.4}
       position={[0, -0.5, 0]}
     />
   );
@@ -286,10 +294,9 @@ export default function ProductViewer3D({
   };
 
   const handleReset = () => {
-    setZoom(1);
+    setZoom(6);
     setAutoRotate(true);
   };
-
   const toggleView = () => {
     if (modelUrl) {
       setIsModelView(!isModelView);

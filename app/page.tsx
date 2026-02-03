@@ -10,7 +10,7 @@ export default async function ProductsPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  // Server-side এ URL params extract করা
+  // Server-side  URL params extract
   const initialFilters = {
     search: (searchParams.search as string) || "",
     categories: searchParams.categories
