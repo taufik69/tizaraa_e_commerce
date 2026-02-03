@@ -1,3 +1,4 @@
+// HeaderClient.tsx (Client Component)
 "use client";
 
 import React, { useMemo, useState } from "react";
@@ -11,6 +12,7 @@ import {
   Tag,
   Heart,
   User,
+  LucideIcon,
 } from "lucide-react";
 import { useAppSelector } from "@/features/store/hooks/hooks";
 import { selectCartItems } from "@/features/slices/cartSelectors";
@@ -23,7 +25,7 @@ type MenuItem = {
   icon: IconName;
 };
 
-const iconMap: Record<IconName, React.ElementType> = {
+const iconMap: Record<IconName, LucideIcon> = {
   Home,
   Package,
   Tag,
@@ -37,7 +39,6 @@ export default function HeaderClient({
 }) {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
-  // Redux থেকে items আনা
   const items: any = useAppSelector(selectCartItems);
 
   // cartCount = total quantity (better than items.length)
@@ -47,15 +48,15 @@ export default function HeaderClient({
   );
 
   return (
-    <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+    <header className="bg-gray-100 backdrop-blur-sm border-b  border-gray-200 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 bg-linear-to-br from-gary-800 to-gray-800 rounded-lg flex items-center justify-center shadow-lg">
               <ShoppingCart className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-xl md:text-2xl font-bold text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text">
+            <h1 className="text-xl md:text-2xl font-bold text-transparent bg-linear-to-r from-gray-400 to-gray-900 bg-clip-text">
               Tizaraa E-commerce
             </h1>
           </Link>
@@ -97,7 +98,7 @@ export default function HeaderClient({
               <ShoppingCart className="w-6 h-6 text-gray-700 group-hover:text-blue-600 transition-colors" />
 
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-full min-w-5 h-5 px-1 flex items-center justify-center shadow-lg">
+                <span className="absolute -top-1 -right-1 bg-linear-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-full min-w-5 h-5 px-1 flex items-center justify-center shadow-lg">
                   {cartCount > 99 ? "99+" : cartCount}
                 </span>
               )}

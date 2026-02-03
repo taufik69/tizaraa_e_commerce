@@ -1,11 +1,10 @@
+// Header.tsx (Server Component)
 import HeaderClient from "./HeaderClient";
 
 export default async function Header() {
   const menuItems = [
     { name: "Home", href: "/", icon: "Home" },
-    { name: "Products", href: "/products", icon: "Package" },
-    { name: "Categories", href: "/categories", icon: "Tag" },
-    { name: "Wishlist", href: "/wishlist", icon: "Heart" },
+    { name: "Products", href: "/", icon: "Package" },
   ] as const;
 
   return <HeaderClient menuItems={menuItems} />;
