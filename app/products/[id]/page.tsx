@@ -35,10 +35,3 @@ export default function ProductPage({
 
   return <ProductConfigurator product={product} />;
 }
-
-// Generate static params for all products (for static generation)
-// export async function generateStaticParams() {
-//   return mockProducts.map((product) => ({
-//     id: product.id,
-//   }));
-// }

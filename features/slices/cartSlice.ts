@@ -138,6 +138,7 @@ export const addRecentlyViewedAsync = createAsyncThunk(
     try {
       await cartDB.addRecentlyViewed(productId);
       const recentlyViewed = await cartDB.getRecentlyViewed();
+
       return recentlyViewed;
     } catch (error) {
       return rejectWithValue("Failed to add to recently viewed");

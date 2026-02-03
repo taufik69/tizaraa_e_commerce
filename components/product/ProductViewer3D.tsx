@@ -584,7 +584,7 @@ export default function ProductViewer3D({
                 key={index}
                 onClick={() => {
                   setCurrentImageIndex(index);
-                  console.log("first masdoih ");
+
                   handleSelectedImage?.(image, index);
                   if (modelUrl) {
                     setIsModelView(false);

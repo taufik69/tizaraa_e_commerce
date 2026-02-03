@@ -42,6 +42,10 @@ export interface CartItem {
   addedAt?: Date | string;
   quantity: number;
   customizations?: Record<string, any>;
+  selectedImage?: {
+    image: string;
+    index: number;
+  };
 }
 
 export interface PromoCode {

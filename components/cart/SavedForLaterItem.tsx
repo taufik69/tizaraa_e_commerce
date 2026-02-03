@@ -38,6 +38,7 @@ export default function SavedForLaterItem({ item }: SavedForLaterItemProps) {
             selectedVariants: item.selectedVariants,
             quantity: item.quantity,
             addedAt: item.addedAt,
+            selectedImage: item.selectedImage,
           },
         }),
       ).unwrap();
@@ -50,11 +51,26 @@ export default function SavedForLaterItem({ item }: SavedForLaterItemProps) {
     <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow">
       <div className="flex gap-4">
         <div className="w-20 h-20 shrink-0 bg-gray-100 rounded-lg overflow-hidden">
-          <img
-            src={product.images[0]}
-            alt={product.name}
-            className="w-full h-full object-cover"
-          />
+          <div className="w-32 h-32 shrink-0 bg-gray-100 rounded-lg overflow-hidden">
+            {item?.selectedImage == null ? (
+              <img
+                src={product.images[0]}
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              product.images.map((image, index) =>
+                index === item?.selectedImage?.index ? (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : null,
+              )
+            )}
+          </div>
         </div>
 
         <div className="flex-1 min-w-0">

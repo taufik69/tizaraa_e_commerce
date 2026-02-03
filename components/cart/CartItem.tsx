@@ -27,7 +27,6 @@ interface CartItemProps {
 }
 
 export default function CartItem({ item }: CartItemProps) {
-  console.log("item", item.selectedImage);
   const dispatch = useAppDispatch();
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -108,6 +107,7 @@ export default function CartItem({ item }: CartItemProps) {
             selectedVariants: item.selectedVariants,
             quantity: item.quantity,
             addedAt: item.addedAt,
+            selectedImage: item.selectedImage,
           },
         }),
       ).unwrap();

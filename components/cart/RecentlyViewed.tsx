@@ -20,7 +20,9 @@ export default function RecentlyViewed() {
 
   return (
     <div className="mt-12">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Recently Viewed</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        Recently Viewed Products {recentlyViewedProducts?.length}
+      </h2>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {recentlyViewedProducts.map((product) => (

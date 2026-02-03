@@ -3,7 +3,6 @@
 
 import React, { useState } from "react";
 import { Product } from "@/data/mockData";
-import { validatePromoCode } from "@/data/mockData";
 import { useAppDispatch } from "@/features/store/hooks/hooks";
 import {
   addToCartAsync,
@@ -34,13 +33,6 @@ export default function PricingDisplay({
   selectedImage,
 }: PricingDisplayProps) {
   const dispatch = useAppDispatch();
-  const [promoCode, setPromoCode] = useState("");
-  const [promoApplied, setPromoApplied] = useState<{
-    code: string;
-    discount: number;
-  } | null>(null);
-  const [promoError, setPromoError] = useState("");
-  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   // Calculate pricing breakdown
@@ -62,11 +54,13 @@ export default function PricingDisplay({
 
   const configuratedPrice =
     basePrice + colorModifier + materialModifier + sizeModifier;
+
   const subtotal = configuratedPrice * quantity;
 
-  // Calculate quantity discount
+  // Quantity discount
   let quantityDiscount = 0;
   let quantityDiscountPercent = 0;
+
   if (quantity >= 10) {
     quantityDiscountPercent = 15;
     quantityDiscount = Math.round(subtotal * 0.15);
@@ -78,50 +72,7 @@ export default function PricingDisplay({
     quantityDiscount = Math.round(subtotal * 0.05);
   }
 
-  const afterQuantityDiscount = subtotal - quantityDiscount;
-
-  // Calculate promo discount
-  const promoDiscount = promoApplied?.discount || 0;
-
-  // Final total
-  const finalTotal = afterQuantityDiscount - promoDiscount;
-
-  // Total savings
-  const totalSavings = quantityDiscount + promoDiscount;
-
-  const handleApplyPromo = async () => {
-    if (!promoCode.trim()) {
-      setPromoError("Please enter a promo code");
-      return;
-    }
-
-    setIsApplyingPromo(true);
-    setPromoError("");
-
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const result = validatePromoCode(promoCode, afterQuantityDiscount);
-
-    if (result.valid) {
-      setPromoApplied({
-        code: promoCode.toUpperCase(),
-        discount: result.discount,
-      });
-      setPromoError("");
-      setPromoCode("");
-    } else {
-      setPromoError(result.message);
-      setPromoApplied(null);
-    }
-
-    setIsApplyingPromo(false);
-  };
-
-  const handleRemovePromo = () => {
-    setPromoApplied(null);
-    setPromoError("");
-  };
+  const finalTotal = subtotal - quantityDiscount;
 
   const handleAddToCart = async () => {
     if (!colorVariant || !materialVariant || !sizeVariant) {
@@ -140,16 +91,16 @@ export default function PricingDisplay({
           material: selectedVariants.material,
           size: selectedVariants.size,
         },
-        quantity: quantity,
+        quantity,
         addedAt: new Date().toISOString(),
-        selectedImage: selectedImage,
+        selectedImage, // ✅ persist selected image
       };
 
       // Optimistic update
-      dispatch(optimisticAddToCart(cartItem));
+      dispatch(optimisticAddToCart(cartItem as any));
 
       // Actual async operation
-      await dispatch(addToCartAsync(cartItem)).unwrap();
+      await dispatch(addToCartAsync(cartItem as any)).unwrap();
     } catch (error) {
       console.error("Failed to add to cart:", error);
       alert("Failed to add item to cart. Please try again.");
@@ -165,6 +116,7 @@ export default function PricingDisplay({
         <label className="text-sm font-semibold text-gray-900 mb-1">
           Quantity
         </label>
+
         <div className="flex items-center gap-3">
           <button
             onClick={() => quantity > 1 && onQuantityChange(quantity - 1)}
@@ -246,13 +198,11 @@ export default function PricingDisplay({
         <h3 className="text-sm font-semibold text-gray-900">Price Breakdown</h3>
 
         <div className="space-y-2 text-sm">
-          {/* Base Price */}
           <div className="flex justify-between text-gray-600">
             <span>Base Price</span>
             <span>৳{basePrice.toLocaleString()}</span>
           </div>
 
-          {/* Variant Modifiers */}
           {colorModifier !== 0 && (
             <div className="flex justify-between text-gray-600">
               <span className="flex items-center gap-1">
@@ -290,99 +240,38 @@ export default function PricingDisplay({
             </div>
           )}
 
-          {/* Configured Unit Price */}
           <div className="flex justify-between font-medium text-gray-900 pt-2 border-t">
             <span>Unit Price</span>
             <span>৳{configuratedPrice.toLocaleString()}</span>
           </div>
 
-          {/* Quantity */}
           <div className="flex justify-between text-gray-600">
             <span>Quantity</span>
             <span>× {quantity}</span>
           </div>
 
-          {/* Subtotal */}
           <div className="flex justify-between font-medium text-gray-900">
             <span>Subtotal</span>
             <span>৳{subtotal.toLocaleString()}</span>
           </div>
 
-          {/* Quantity Discount */}
           {quantityDiscount > 0 && (
             <div className="flex justify-between text-green-600 font-medium">
               <span>Quantity Discount ({quantityDiscountPercent}%)</span>
               <span>-৳{quantityDiscount.toLocaleString()}</span>
             </div>
           )}
-
-          {/* Promo Discount */}
-          {promoApplied && (
-            <div className="flex justify-between text-blue-600 font-medium">
-              <span className="flex items-center gap-1">
-                Promo: {promoApplied.code}
-                <button
-                  onClick={handleRemovePromo}
-                  className="text-red-500 hover:text-red-700"
-                  title="Remove promo"
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </span>
-              <span>-৳{promoDiscount.toLocaleString()}</span>
-            </div>
-          )}
         </div>
       </div>
-
-      {/* Promo Code Input */}
-      {!promoApplied && (
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-gray-900">
-            Have a promo code?
-          </label>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={promoCode}
-              onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-              onKeyPress={(e) => e.key === "Enter" && handleApplyPromo()}
-              placeholder="Enter code"
-              className="flex-1 px-3 py-2 border border-gray-300 placeholder:text-black text-black rounded-lg focus:outline-none focus:border-blue-500 text-sm uppercase"
-            />
-            <button
-              onClick={handleApplyPromo}
-              disabled={isApplyingPromo || !promoCode.trim()}
-              className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium disabled:opacity-50"
-            >
-              {isApplyingPromo ? "Checking..." : "Apply"}
-            </button>
-          </div>
-          {promoError && <p className="text-xs text-red-600">{promoError}</p>}
-          <p className="text-xs text-gray-500">
-            Try: WELCOME10, SAVE500, MEGA25
-          </p>
-        </div>
-      )}
 
       {/* Total */}
       <div className="pt-4 border-t-2 border-gray-900">
         <div className="flex justify-between items-baseline mb-2">
           <span className="text-lg font-bold text-gray-900">Total</span>
           <div className="text-right">
-            {totalSavings > 0 && (
+            {quantityDiscount > 0 && (
               <p className="text-sm text-green-600 font-medium mb-1">
-                You save ৳{totalSavings.toLocaleString()}!
+                You save ৳{quantityDiscount.toLocaleString()}!
               </p>
             )}
             <p className="text-2xl font-bold text-gray-900">

@@ -341,7 +341,7 @@ export default function Cart() {
                   onClick={() =>
                     alert("Checkout functionality - to be implemented")
                   }
-                  className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl"
+                  className="w-full py-4 bg-gray-700 hover:bg-gray-900 cursor-pointer text-white font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl"
                 >
                   Proceed to Checkout
                 </button>

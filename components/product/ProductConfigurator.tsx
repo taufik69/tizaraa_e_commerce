@@ -6,6 +6,8 @@ import { Product } from "@/data/mockData";
 import VariantSelector from "./VariantSelector";
 import PricingDisplay from "./PricingDisplay";
 import { useSearchParams, useRouter } from "next/navigation";
+import { addRecentlyViewedAsync } from "@/features/slices/cartSlice";
+import { useAppDispatch } from "@/features/store/hooks/hooks";
 
 // Lazy load 3D viewer for performance
 const ProductViewer3D = lazy(() => import("./ProductViewer3D"));
@@ -19,6 +21,7 @@ export default function ProductConfigurator({
 }: ProductConfiguratorProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const dispatch = useAppDispatch();
 
   // Initialize state from URL or defaults
   const [selectedVariants, setSelectedVariants] = useState(() => {
@@ -65,6 +68,11 @@ export default function ProductConfigurator({
     setShareUrl(`${window.location.origin}${newUrl}`);
   }, [selectedVariants, quantity]);
 
+  // Add product to recently viewed
+  useEffect(() => {
+    if (!product.id) return;
+    dispatch(addRecentlyViewedAsync(product.id));
+  }, [dispatch, product.id]);
   const handleVariantChange = (
     type: "color" | "material" | "size",
     variantId: string,
@@ -116,7 +124,6 @@ export default function ProductConfigurator({
       image,
       index,
     });
-    console.log("index", image, index);
   };
 
   return (
