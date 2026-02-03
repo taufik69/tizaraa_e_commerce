@@ -21,6 +21,8 @@ import {
 } from "@/features/slices/cartSelectors";
 
 import { validatePromoCode } from "@/data/mockData";
+import ConfirmModal from "../ui/ConfirmModal";
+import Link from "next/link";
 
 export default function Cart() {
   const dispatch = useAppDispatch();
@@ -48,6 +50,10 @@ export default function Cart() {
   const [promoCode, setPromoCode] = useState("");
   const [promoError, setPromoError] = useState("");
   const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+  const [removeOpen, setRemoveOpen] = useState(false);
+  const [removeLoading, setRemoveLoading] = useState(false);
+  const [clearOpen, setClearOpen] = useState(false);
+  const [clearLoading, setClearLoading] = useState(false);
 
   const handleApplyPromo = async () => {
     if (!promoCode.trim()) {
@@ -80,13 +86,19 @@ export default function Cart() {
     setIsApplyingPromo(false);
   };
 
-  const handleClearCart = async () => {
-    if (
-      window.confirm(
-        "Are you sure you want to clear your cart? This action cannot be undone.",
-      )
-    ) {
-      dispatch(clearCartAsync());
+  const handleClearCart = () => {
+    setClearOpen(true);
+  };
+
+  const confirmClearCart = async () => {
+    setClearLoading(true);
+    try {
+      await dispatch(clearCartAsync()).unwrap();
+      setClearOpen(false);
+    } catch (err) {
+      console.error("Failed to clear cart", err);
+    } finally {
+      setClearLoading(false);
     }
   };
 
@@ -94,7 +106,7 @@ export default function Cart() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-16 h-16 border-4 border-gray-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Loading your cart...</p>
         </div>
       </div>
@@ -124,7 +136,7 @@ export default function Cart() {
           {items.length > 0 && (
             <button
               onClick={handleClearCart}
-              className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              className="px-4 py-2 text-red-600 border-red-300 border cursor pointer hover:bg-red-50 rounded-lg transition-colors"
             >
               Clear Cart
             </button>
@@ -337,14 +349,12 @@ export default function Cart() {
                 </div>
 
                 {/* Checkout Button */}
-                <button
-                  onClick={() =>
-                    alert("Checkout functionality - to be implemented")
-                  }
-                  className="w-full py-4 bg-gray-700 hover:bg-gray-900 cursor-pointer text-white font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl"
+                <Link
+                  href={"/checkout"}
+                  className="w-full block text-center py-4 bg-gray-700 hover:bg-gray-900 cursor-pointer text-white font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl"
                 >
                   Proceed to Checkout
-                </button>
+                </Link>
 
                 {/* Additional Info */}
                 <div className="text-xs text-gray-500 space-y-1 pt-2 border-t">
@@ -373,6 +383,18 @@ export default function Cart() {
 
         {/* Recently Viewed */}
         <RecentlyViewed />
+
+        <ConfirmModal
+          open={clearOpen}
+          title="Clear cart?"
+          message="Are you sure you want to clear your cart? This action cannot be undone."
+          confirmText="Yes, clear cart"
+          cancelText="No, keep items"
+          danger
+          loading={clearLoading}
+          onClose={() => (clearLoading ? null : setClearOpen(false))}
+          onConfirm={confirmClearCart}
+        />
       </div>
     </div>
   );

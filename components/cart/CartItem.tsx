@@ -3,6 +3,7 @@
 
 import React, { useState } from "react";
 import { CartItem as CartItemType } from "@/data/mockData";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 import {
   getProductById,
@@ -29,6 +30,8 @@ interface CartItemProps {
 export default function CartItem({ item }: CartItemProps) {
   const dispatch = useAppDispatch();
   const [isUpdating, setIsUpdating] = useState(false);
+  const [removeOpen, setRemoveOpen] = useState(false);
+  const [removeLoading, setRemoveLoading] = useState(false);
 
   const product = getProductById(item.productId);
   if (!product) return null;
@@ -86,13 +89,15 @@ export default function CartItem({ item }: CartItemProps) {
     }
   };
 
-  const handleRemove = async () => {
-    if (window.confirm("Remove this item from your cart?")) {
-      try {
-        await dispatch(removeFromCartAsync(item.id)).unwrap();
-      } catch (error) {
-        console.error("Failed to remove item:", error);
-      }
+  const confirmRemove = async () => {
+    setRemoveLoading(true);
+    try {
+      await dispatch(removeFromCartAsync(item.id)).unwrap();
+      setRemoveOpen(false);
+    } catch (error) {
+      console.error("Failed to remove item:", error);
+    } finally {
+      setRemoveLoading(false);
     }
   };
 
@@ -151,7 +156,7 @@ export default function CartItem({ item }: CartItemProps) {
               <p className="text-sm text-gray-600">{product.brand}</p>
             </div>
             <button
-              onClick={handleRemove}
+              onClick={() => setRemoveOpen(true)}
               className="text-gray-400 hover:text-red-600 transition-colors"
               title="Remove from cart"
             >
@@ -300,6 +305,18 @@ export default function CartItem({ item }: CartItemProps) {
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        open={removeOpen}
+        title="Remove item?"
+        message="Are you sure you want to remove this item from your cart?"
+        confirmText="Yes, remove"
+        cancelText="No, keep"
+        danger
+        loading={removeLoading}
+        onClose={() => (removeLoading ? null : setRemoveOpen(false))}
+        onConfirm={confirmRemove}
+      />
     </div>
   );
 }
