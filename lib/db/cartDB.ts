@@ -1,4 +1,3 @@
-// src/lib/db/cartDB.ts
 import { CartItem } from "@/data/mockData";
 
 const DB_NAME = "ProductConfiguratorDB";

@@ -9,14 +9,19 @@ import {
   getStockLevel,
   getStockMessage,
 } from "@/data/mockData";
-import { removeFromCart, updateQuantity } from "@/features/slices/cartSlice";
-import SavedForLaterItem from "./SavedForLaterItem";
+import { useAppDispatch } from "@/features/store/hooks/hooks";
+import {
+  removeFromCartAsync,
+  updateCartItemAsync,
+  saveForLaterAsync,
+} from "@/features/slices/cartSlice";
 
 interface CartItemProps {
   item: CartItemType & { id: number };
 }
 
 export default function CartItem({ item }: CartItemProps) {
+  const dispatch = useAppDispatch();
   const [isUpdating, setIsUpdating] = useState(false);
 
   const product = getProductById(item.productId);
@@ -62,7 +67,12 @@ export default function CartItem({ item }: CartItemProps) {
 
     setIsUpdating(true);
     try {
-      updateQuantity(item.id, newQuantity);
+      await dispatch(
+        updateCartItemAsync({
+          id: item.id,
+          updates: { quantity: newQuantity },
+        }),
+      ).unwrap();
     } catch (error) {
       console.error("Failed to update quantity:", error);
     } finally {
@@ -70,19 +80,30 @@ export default function CartItem({ item }: CartItemProps) {
     }
   };
 
-  const handleRemove = () => {
+  const handleRemove = async () => {
     if (window.confirm("Remove this item from your cart?")) {
       try {
-        removeFromCart(item.id);
+        await dispatch(removeFromCartAsync(item.id)).unwrap();
       } catch (error) {
         console.error("Failed to remove item:", error);
       }
     }
   };
 
-  const handleSaveForLater = () => {
+  const handleSaveForLater = async () => {
     try {
-      SavedForLaterItem(item.id, item);
+      await dispatch(
+        saveForLaterAsync({
+          cartItemId: item.id,
+          item: {
+            key: item.key,
+            productId: item.productId,
+            selectedVariants: item.selectedVariants,
+            quantity: item.quantity,
+            addedAt: item.addedAt,
+          },
+        }),
+      ).unwrap();
     } catch (error) {
       console.error("Failed to save for later:", error);
     }

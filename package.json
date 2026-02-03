@@ -21,6 +21,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-redux": "^9.2.0",
+    "react-toastify": "^11.0.5",
     "three": "^0.182.0"
   },
   "devDependencies": {

@@ -7,9 +7,9 @@ import RecentlyViewed from "./RecentlyViewed";
 
 import { useAppDispatch, useAppSelector } from "@/features/store/hooks/hooks";
 import {
-  clearCart,
-  applyPromo,
-  removePromo,
+  clearCartAsync,
+  applyPromoCode,
+  removePromoCode,
 } from "@/features/slices/cartSlice";
 
 import {
@@ -66,7 +66,7 @@ export default function Cart() {
 
     if (result.valid) {
       dispatch(
-        applyPromo({
+        applyPromoCode({
           code: promoCode.toUpperCase(),
           discount: result.discount,
         }),
@@ -86,7 +86,7 @@ export default function Cart() {
         "Are you sure you want to clear your cart? This action cannot be undone.",
       )
     ) {
-      dispatch(clearCart());
+      dispatch(clearCartAsync());
     }
   };
 
@@ -254,7 +254,7 @@ export default function Cart() {
                       <span className="flex items-center gap-1">
                         Promo: {appliedPromoCode.code}
                         <button
-                          onClick={() => dispatch(removePromo())}
+                          onClick={() => dispatch(removePromoCode())}
                           className="text-red-500 hover:text-red-700"
                           title="Remove promo"
                         >

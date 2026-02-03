@@ -38,6 +38,8 @@ export interface CartItem {
     material: string;
     size: string;
   };
+  key?: number | string | any;
+  addedAt?: Date | string;
   quantity: number;
   customizations?: Record<string, any>;
 }

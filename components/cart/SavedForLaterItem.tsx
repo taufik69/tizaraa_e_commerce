@@ -3,7 +3,8 @@
 
 import React from "react";
 import { CartItem } from "@/data/mockData";
-import { useCart } from "@/features/store/hooks/useCart";
+import { useAppDispatch } from "@/features/store/hooks/hooks";
+import { moveToCartAsync } from "@/features/slices/cartSlice";
 import { getProductById } from "@/data/mockData";
 
 interface SavedForLaterItemProps {
@@ -11,7 +12,7 @@ interface SavedForLaterItemProps {
 }
 
 export default function SavedForLaterItem({ item }: SavedForLaterItemProps) {
-  const { moveToCart } = useCart();
+  const dispatch = useAppDispatch();
 
   const product = getProductById(item.productId);
   if (!product) return null;
@@ -28,7 +29,18 @@ export default function SavedForLaterItem({ item }: SavedForLaterItemProps) {
 
   const handleMoveToCart = async () => {
     try {
-      await moveToCart(item.id, item);
+      await dispatch(
+        moveToCartAsync({
+          savedItemId: item.id,
+          item: {
+            key: item.key,
+            productId: item.productId,
+            selectedVariants: item.selectedVariants,
+            quantity: item.quantity,
+            addedAt: item.addedAt,
+          },
+        }),
+      ).unwrap();
     } catch (error) {
       console.error("Failed to move to cart:", error);
     }

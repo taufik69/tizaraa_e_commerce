@@ -1,11 +1,15 @@
 // src/components/product/PricingDisplay.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Product } from "@/data/mockData";
-import { calculateProductPrice, validatePromoCode } from "@/data/mockData";
+import { validatePromoCode } from "@/data/mockData";
 import { useAppDispatch } from "@/features/store/hooks/hooks";
-import { addToCart } from "@/features/slices/cartSlice";
+import {
+  addToCartAsync,
+  optimisticAddToCart,
+} from "@/features/slices/cartSlice";
+import Link from "next/link";
 
 interface PricingDisplayProps {
   product: Product;
@@ -32,6 +36,7 @@ export default function PricingDisplay({
   } | null>(null);
   const [promoError, setPromoError] = useState("");
   const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   // Calculate pricing breakdown
   const basePrice = product.basePrice;
@@ -114,22 +119,39 @@ export default function PricingDisplay({
   };
 
   const handleAddToCart = async () => {
-    const { variants, ...productWithoutVariant } = product;
+    if (!colorVariant || !materialVariant || !sizeVariant) {
+      alert("Please select all product variants");
+      return;
+    }
 
-    dispatch(
-      addToCart({
-        product: productWithoutVariant,
+    setIsAddingToCart(true);
+
+    try {
+      const cartItem = {
+        key: `${product.id}-${selectedVariants.color}-${selectedVariants.material}-${selectedVariants.size}`,
+        productId: product.id,
         selectedVariants: {
-          color: colorVariant,
-          material: materialVariant,
-          size: sizeVariant,
+          color: selectedVariants.color,
+          material: selectedVariants.material,
+          size: selectedVariants.size,
         },
         quantity: quantity,
-        quantityDiscount,
-        quantityDiscountPercent,
-      }),
-    );
+        addedAt: new Date().toISOString(),
+      };
+
+      // Optimistic update
+      dispatch(optimisticAddToCart(cartItem));
+
+      // Actual async operation
+      await dispatch(addToCartAsync(cartItem)).unwrap();
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+      alert("Failed to add item to cart. Please try again.");
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6 sticky top-4">
       {/* Quantity Selector */}
@@ -366,11 +388,45 @@ export default function PricingDisplay({
 
       {/* Add to Cart Button */}
       <button
-        className="w-full py-4 bg-gray-800 hover:bg-gray-700 cursor-pointer text-white font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl"
+        className="w-full py-4 bg-gray-800 hover:bg-gray-700 cursor-pointer text-white font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={handleAddToCart}
+        disabled={isAddingToCart}
       >
-        Add to Cart
+        {isAddingToCart ? (
+          <span className="flex items-center justify-center gap-2">
+            <svg
+              className="w-5 h-5 animate-spin"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
+            </svg>
+            Adding to Cart...
+          </span>
+        ) : (
+          "Add to Cart"
+        )}
       </button>
+
+      {/* cart page */}
+      <Link
+        href={"/cart"}
+        className="w-full h-full text-center bg-red-500 block py-4"
+      >
+        cart
+      </Link>
 
       {/* Additional Info */}
       <div className="text-xs text-gray-500 space-y-1 pt-2 border-t">

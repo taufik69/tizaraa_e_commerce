@@ -3,6 +3,8 @@ import { CartItem, PromoCode, mockPromoCodes } from "@/data/mockData";
 import { cartDB } from "@/lib/db/cartDB";
 import { calculateProductPrice, getProductById } from "@/data/mockData";
 
+import { SucessToast } from "@/helpers/toast";
+
 interface CartState {
   items: (CartItem & { id: number })[];
   savedForLater: (CartItem & { id: number })[];
@@ -46,6 +48,7 @@ export const addToCartAsync = createAsyncThunk(
   async (item: CartItem, { rejectWithValue }) => {
     try {
       const id = await cartDB.addToCart(item);
+      SucessToast("Add To Cart Sucessfullly");
       return { ...item, id };
     } catch (error) {
       return rejectWithValue("Failed to add item to cart");
@@ -60,6 +63,7 @@ export const updateCartItemAsync = createAsyncThunk(
     { rejectWithValue },
   ) => {
     try {
+      console.log(id, updates);
       await cartDB.updateCartItem(id, updates);
       return { id, updates };
     } catch (error) {
@@ -146,7 +150,6 @@ const cartSlice = createSlice({
   reducers: {
     // Optimistic updates for better UX
     optimisticAddToCart: (state, action: PayloadAction<CartItem>) => {
-      console.log("hi", action.payload);
       const tempId = Date.now();
       state.items.push({ ...action.payload, id: tempId });
     },
@@ -173,7 +176,7 @@ const cartSlice = createSlice({
       state.items = action.payload;
     },
 
-    // Promo code management
+    // Promo code management (renamed actions)
     applyPromoCode: (
       state,
       action: PayloadAction<{ code: string; discount: number }>,

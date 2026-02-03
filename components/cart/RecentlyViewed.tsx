@@ -2,10 +2,17 @@
 "use client";
 
 import React from "react";
-import { useCart } from "@/features/store/hooks/useCart";
+import { useAppSelector } from "@/features/store/hooks/hooks";
+import { selectRecentlyViewed } from "@/features/slices/cartSelectors";
+import { getProductById } from "@/data/mockData";
 
 export default function RecentlyViewed() {
-  const { recentlyViewedProducts } = useCart();
+  const recentlyViewedIds = useAppSelector(selectRecentlyViewed);
+
+  // Get product details from IDs
+  const recentlyViewedProducts = recentlyViewedIds
+    .map((id) => getProductById(id))
+    .filter((product) => product !== null);
 
   if (recentlyViewedProducts.length === 0) {
     return null;
@@ -18,20 +25,20 @@ export default function RecentlyViewed() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {recentlyViewedProducts.map((product) => (
           <a
-            key={product.id}
-            href={`/products/${product.id}`}
+            key={product?.id}
+            href={`/products/${product?.id}`}
             className="group bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg transition-all"
           >
             <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-3">
               <img
-                src={product.images[0]}
-                alt={product.name}
+                src={product?.images[0]}
+                alt={product?.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform"
               />
             </div>
 
             <h3 className="font-semibold text-gray-900 text-sm mb-1 truncate">
-              {product.name}
+              {product?.name}
             </h3>
 
             <div className="flex items-center gap-1 mb-2">
@@ -40,9 +47,7 @@ export default function RecentlyViewed() {
                   <svg
                     key={i}
                     className={`w-3 h-3 ${
-                      i < Math.floor(product.rating)
-                        ? "text-yellow-400"
-                        : "text-gray-300"
+                      i < Math.floor(3) ? "text-yellow-400" : "text-gray-300"
                     }`}
                     fill="currentColor"
                     viewBox="0 0 20 20"
@@ -52,12 +57,12 @@ export default function RecentlyViewed() {
                 ))}
               </div>
               <span className="text-xs text-gray-600">
-                ({product.reviewCount})
+                ({product?.reviewCount})
               </span>
             </div>
 
             <p className="text-lg font-bold text-gray-900">
-              ৳{product.basePrice.toLocaleString()}
+              ৳{product?.basePrice.toLocaleString()}
             </p>
           </a>
         ))}
