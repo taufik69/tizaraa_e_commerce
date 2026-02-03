@@ -202,6 +202,7 @@ export default function Footer() {
                 {footerLinks.legal.map((link, index) => (
                   <React.Fragment key={link.name}>
                     <Link
+                      key={index}
                       href={link.href}
                       className="text-gray-400 hover:text-blue-400 transition-colors"
                     >

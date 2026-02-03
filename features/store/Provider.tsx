@@ -7,7 +7,7 @@ import { loadCart } from "../slices/cartSlice";
 
 export function ReduxProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
-    //  Redux hydrate from db
+    //   Redux hydrate from db
     store.dispatch(loadCart());
   }, []);
   return <Provider store={store}>{children}</Provider>;

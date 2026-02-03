@@ -113,11 +113,9 @@ export default function PricingDisplay({
     <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6 sticky top-4">
       {/* Quantity Selector */}
       <div className="space-y-3">
-        <label className="text-sm font-semibold text-gray-900 mb-1">
-          Quantity
-        </label>
+        <label className="text-sm font-semibold text-gray-900 ">Quantity</label>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 mt-3">
           <button
             onClick={() => quantity > 1 && onQuantityChange(quantity - 1)}
             className="w-10 h-10 rounded-lg border-2 border-gray-900 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-40 text-black cursor-pointer"
@@ -314,14 +312,6 @@ export default function PricingDisplay({
           "Add to Cart"
         )}
       </button>
-
-      {/* cart page */}
-      <Link
-        href={"/cart"}
-        className="w-full h-full text-center bg-red-500 block py-4"
-      >
-        cart
-      </Link>
 
       {/* Additional Info */}
       <div className="text-xs text-gray-500 space-y-1 pt-2 border-t">
