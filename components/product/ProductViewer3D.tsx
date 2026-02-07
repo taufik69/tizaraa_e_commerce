@@ -391,7 +391,7 @@ export default function ProductViewer3D({
                 autoRotate={autoRotate}
                 autoRotateSpeed={0.6}
                 enablePan={false}
-                // ✅ IMPORTANT:
+                //  IMPORTANT:
                 // Desktop: keep zoom enabled (wheel + pinch trackpad)
                 // Mobile: disable zoom so page doesn't scroll weird; use icons
                 enableZoom={!isTouch}
@@ -472,7 +472,7 @@ export default function ProductViewer3D({
                 )}
               </button>
 
-              {/* ✅ Zoom icons always work (desktop + mobile) */}
+              {/*  Zoom icons always work (desktop + mobile) */}
               <button
                 onClick={handleZoomIn}
                 disabled={zoom <= MIN_ZOOM}
@@ -655,7 +655,7 @@ export default function ProductViewer3D({
             <span className="text-xs text-gray-500">({images.length})</span>
           </div>
 
-          {/* ✅ mobile: 3 cols, sm:4 cols, md:6 cols */}
+          {/*  mobile: 3 cols, sm:4 cols, md:6 cols */}
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 sm:gap-3">
             {images.map((image, index) => (
               <button
