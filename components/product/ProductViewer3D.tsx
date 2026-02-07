@@ -14,16 +14,25 @@ interface ProductViewer3DProps {
   handleSelectedImage?: (image: string, index: number) => void;
 }
 
-// Loading component
-function LoadingSkeleton() {
-  return (
-    <div className="w-full h-full flex items-center justify-center bg-gray-50">
-      <div className="text-center space-y-4">
-        <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-sm text-gray-600 font-medium">Loading 3D Model...</p>
-      </div>
-    </div>
-  );
+/** Detect mobile/touch device */
+function useIsTouchDevice() {
+  const [isTouch, setIsTouch] = useState(false);
+
+  useEffect(() => {
+    const check = () => {
+      const hasTouch =
+        typeof window !== "undefined" &&
+        ("ontouchstart" in window ||
+          (navigator as any).maxTouchPoints > 0 ||
+          window.matchMedia("(pointer: coarse)").matches);
+      setIsTouch(Boolean(hasTouch));
+    };
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  return isTouch;
 }
 
 // Camera Controller for smooth zoom
@@ -60,7 +69,6 @@ function Model({
       if (child instanceof THREE.Mesh) {
         const mat = child.material;
 
-        // multiple materials support
         if (Array.isArray(mat)) {
           child.material = mat.map((m) => {
             const m2 = m.clone() as THREE.MeshStandardMaterial;
@@ -68,7 +76,9 @@ function Model({
             return m2;
           });
         } else if (mat) {
-          const m2 = mat.clone() as THREE.MeshStandardMaterial;
+          const m2 = (
+            mat as THREE.Material
+          ).clone() as THREE.MeshStandardMaterial;
           if ("color" in m2) m2.color = new THREE.Color(selectedColor);
           child.material = m2;
         }
@@ -106,7 +116,6 @@ function ImageViewer({
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Native wheel event listener to prevent page scroll
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -114,17 +123,12 @@ function ImageViewer({
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
       e.stopPropagation();
-
       const delta = e.deltaY > 0 ? -10 : 10;
       setZoom((prev) => Math.min(Math.max(prev + delta, 50), 300));
     };
 
-    // Add event listener with passive: false to allow preventDefault
     container.addEventListener("wheel", handleWheel, { passive: false });
-
-    return () => {
-      container.removeEventListener("wheel", handleWheel);
-    };
+    return () => container.removeEventListener("wheel", handleWheel);
   }, []);
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -143,9 +147,7 @@ function ImageViewer({
     }
   };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
+  const handleMouseUp = () => setIsDragging(false);
 
   const handleReset = () => {
     setZoom(100);
@@ -176,12 +178,12 @@ function ImageViewer({
         draggable={false}
       />
 
-      {/* Zoom Controls */}
-      <div className="absolute top-4 right-4 space-y-2">
+      {/* Zoom Controls - responsive */}
+      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 space-y-2">
         <button
           onClick={() => setZoom((prev) => Math.min(prev + 20, 300))}
           disabled={zoom >= 300}
-          className="p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl hover:bg-white transition-all hover:scale-105 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed group"
+          className="p-2.5 sm:p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl hover:bg-white transition-all hover:scale-105 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed group"
           title="Zoom in"
         >
           <svg
@@ -206,7 +208,7 @@ function ImageViewer({
         <button
           onClick={() => setZoom((prev) => Math.max(prev - 20, 50))}
           disabled={zoom <= 50}
-          className="p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl hover:bg-white transition-all hover:scale-105 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed group"
+          className="p-2.5 sm:p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl hover:bg-white transition-all hover:scale-105 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed group"
           title="Zoom out"
         >
           <svg
@@ -230,7 +232,7 @@ function ImageViewer({
 
         <button
           onClick={handleReset}
-          className="p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl hover:bg-white transition-all hover:scale-105 border border-gray-200 group"
+          className="p-2.5 sm:p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl hover:bg-white transition-all hover:scale-105 border border-gray-200 group"
           title="Reset view"
         >
           <svg
@@ -250,13 +252,13 @@ function ImageViewer({
       </div>
 
       {/* Zoom Indicator */}
-      <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg px-3 py-1.5 border border-gray-200">
+      <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg px-3 py-1.5 border border-gray-200">
         <p className="text-xs text-gray-600 font-medium">{zoom}% zoom</p>
       </div>
 
       {/* Instructions */}
-      <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg px-4 py-2.5 border border-gray-200">
-        <p className="text-xs text-gray-700">
+      <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg px-3 sm:px-4 py-2 border border-gray-200">
+        <p className="text-[11px] sm:text-xs text-gray-700">
           <span className="font-semibold text-gray-900">2D View</span>
           <span className="mx-1.5 text-gray-400">•</span>
           Scroll to zoom
@@ -271,7 +273,7 @@ function ImageViewer({
     </div>
   );
 }
-// Main Viewer
+
 export default function ProductViewer3D({
   productName,
   selectedColor,
@@ -280,44 +282,92 @@ export default function ProductViewer3D({
   modelUrl,
   handleSelectedImage,
 }: ProductViewer3DProps) {
+  const isTouch = useIsTouchDevice();
+
   const [autoRotate, setAutoRotate] = useState(true);
-  const [zoom, setZoom] = useState(1);
+
+  // ✅ zoom = camera z position (smaller => closer)
+  const [zoom, setZoom] = useState(6);
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isModelView, setIsModelView] = useState(!!modelUrl);
 
-  const handleZoomIn = () => {
-    setZoom((prev) => Math.max(prev - 1, 3));
-  };
+  // ✅ Fix your zoom functions (your old code had wrong min/max logic)
+  const MIN_ZOOM = 3; // closest
+  const MAX_ZOOM = 12; // farthest
+  const ZOOM_STEP = 0.8;
 
-  const handleZoomOut = () => {
-    setZoom((prev) => Math.min(prev + 1, 12));
-  };
-
+  const handleZoomIn = () =>
+    setZoom((prev) => Math.max(prev - ZOOM_STEP, MIN_ZOOM));
+  const handleZoomOut = () =>
+    setZoom((prev) => Math.min(prev + ZOOM_STEP, MAX_ZOOM));
   const handleReset = () => {
     setZoom(6);
     setAutoRotate(true);
   };
+
   const toggleView = () => {
-    if (modelUrl) {
-      setIsModelView(!isModelView);
-    }
+    if (modelUrl) setIsModelView((prev) => !prev);
   };
+
+  // ✅ Desktop only: allow scroll wheel zoom IN 3D view
+  // Mobile/touch: disable wheel zoom; user uses icons only
+  const canvasWheelHandler = (e: WheelEvent) => {
+    if (!isModelView) return;
+    if (isTouch) return;
+
+    // prevent page scroll while zooming 3D
+    e.preventDefault();
+    e.stopPropagation();
+
+    const delta = e.deltaY > 0 ? +ZOOM_STEP : -ZOOM_STEP; // wheel down => zoom out
+    setZoom((prev) => {
+      const next = prev + delta;
+      return Math.min(Math.max(next, MIN_ZOOM), MAX_ZOOM);
+    });
+  };
+
+  // attach wheel handler only on desktop (non-touch) when model view
+  const viewerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = viewerRef.current;
+    if (!el) return;
+    if (!isModelView) return;
+    if (isTouch) return;
+
+    el.addEventListener("wheel", canvasWheelHandler, { passive: false });
+    return () => {
+      el.removeEventListener("wheel", canvasWheelHandler as any);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isModelView, isTouch]);
+
+  // zoom indicator (0..100)
+  const zoomPercent = Math.round(
+    ((MAX_ZOOM - zoom) / (MAX_ZOOM - MIN_ZOOM)) * 100,
+  );
 
   return (
     <div className="relative w-full space-y-4">
       {/* Main Viewer */}
-      <div className="relative w-full h-125 bg-linear-to-br from-gray-50 via-white to-gray-100 rounded-xl overflow-hidden border border-gray-200 shadow-lg">
-        {/* Show 2D Image Viewer when not in model view */}
+      <div
+        ref={viewerRef}
+        className="
+          relative w-full
+          h-80 sm:h-105 lg:h-130
+          bg-linear-to-br from-gray-50 via-white to-gray-100
+          rounded-xl overflow-hidden border border-gray-200 shadow-lg
+        "
+      >
+        {/* 2D View */}
         {!isModelView ? (
           <ImageViewer
             image={images[currentImageIndex]}
             productName={productName}
           />
         ) : (
-          // Show 3D Canvas when in model view
           <Canvas shadows>
             <CameraController zoom={zoom} />
-
             <Suspense fallback={null}>
               <ambientLight intensity={0.7} />
               <directionalLight
@@ -341,9 +391,12 @@ export default function ProductViewer3D({
                 autoRotate={autoRotate}
                 autoRotateSpeed={0.6}
                 enablePan={false}
-                enableZoom={true}
-                minDistance={3}
-                maxDistance={12}
+                // ✅ IMPORTANT:
+                // Desktop: keep zoom enabled (wheel + pinch trackpad)
+                // Mobile: disable zoom so page doesn't scroll weird; use icons
+                enableZoom={!isTouch}
+                minDistance={MIN_ZOOM}
+                maxDistance={MAX_ZOOM}
                 minPolarAngle={Math.PI / 6}
                 maxPolarAngle={Math.PI / 1.5}
               />
@@ -351,14 +404,14 @@ export default function ProductViewer3D({
           </Canvas>
         )}
 
-        {/* Only show 3D controls when in model view */}
+        {/* Controls (same UI, responsive size) */}
         {isModelView && (
           <>
-            <div className="absolute top-4 right-4 space-y-2  space-x-1">
+            <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex flex-col gap-2">
               {modelUrl && (
                 <button
                   onClick={toggleView}
-                  className="p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl hover:bg-white transition-all hover:scale-105 border border-gray-200 group"
+                  className="p-2.5 sm:p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl hover:bg-white transition-all hover:scale-105 border border-gray-200 group"
                   title="Switch to 2D images"
                 >
                   <svg
@@ -378,8 +431,8 @@ export default function ProductViewer3D({
               )}
 
               <button
-                onClick={() => setAutoRotate(!autoRotate)}
-                className="p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl hover:bg-white transition-all hover:scale-105 border border-gray-200 group"
+                onClick={() => setAutoRotate((p) => !p)}
+                className="p-2.5 sm:p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl hover:bg-white transition-all hover:scale-105 border border-gray-200 group"
                 title={autoRotate ? "Pause rotation" : "Start rotation"}
               >
                 {autoRotate ? (
@@ -419,15 +472,16 @@ export default function ProductViewer3D({
                 )}
               </button>
 
+              {/* ✅ Zoom icons always work (desktop + mobile) */}
               <button
                 onClick={handleZoomIn}
-                disabled={zoom <= 3}
-                className="p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl hover:bg-white transition-all hover:scale-105 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed group"
+                disabled={zoom <= MIN_ZOOM}
+                className="p-2.5 sm:p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl hover:bg-white transition-all hover:scale-105 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed group"
                 title="Zoom in"
               >
                 <svg
                   className={`w-5 h-5 transition-colors ${
-                    zoom <= 3
+                    zoom <= MIN_ZOOM
                       ? "text-gray-300"
                       : "text-gray-600 group-hover:text-gray-800"
                   }`}
@@ -446,13 +500,13 @@ export default function ProductViewer3D({
 
               <button
                 onClick={handleZoomOut}
-                disabled={zoom >= 12}
-                className="p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl hover:bg-white transition-all hover:scale-105 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed group"
+                disabled={zoom >= MAX_ZOOM}
+                className="p-2.5 sm:p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl hover:bg-white transition-all hover:scale-105 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed group"
                 title="Zoom out"
               >
                 <svg
                   className={`w-5 h-5 transition-colors ${
-                    zoom >= 12
+                    zoom >= MAX_ZOOM
                       ? "text-gray-300"
                       : "text-gray-600 group-hover:text-gray-800"
                   }`}
@@ -471,7 +525,7 @@ export default function ProductViewer3D({
 
               <button
                 onClick={handleReset}
-                className="p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl hover:bg-white transition-all hover:scale-105 border border-gray-200 group"
+                className="p-2.5 sm:p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl hover:bg-white transition-all hover:scale-105 border border-gray-200 group"
                 title="Reset view"
               >
                 <svg
@@ -490,30 +544,42 @@ export default function ProductViewer3D({
               </button>
             </div>
 
-            <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg px-4 py-2.5 border border-gray-200">
-              <p className="text-xs text-gray-700">
+            {/* Instructions */}
+            <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg px-3 sm:px-4 py-2 border border-gray-200">
+              <p className="text-[11px] sm:text-xs text-gray-700">
                 <span className="font-semibold text-gray-900">360° View</span>
                 <span className="mx-1.5 text-gray-400">•</span>
                 Drag to rotate
-                <span className="mx-1.5 text-gray-400">•</span>
-                Scroll to zoom
+                {!isTouch && (
+                  <>
+                    <span className="mx-1.5 text-gray-400">•</span>
+                    Scroll to zoom
+                  </>
+                )}
+                {isTouch && (
+                  <>
+                    <span className="mx-1.5 text-gray-400">•</span>
+                    Use + / − to zoom
+                  </>
+                )}
               </p>
             </div>
 
-            <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg px-3 py-1.5 border border-gray-200">
+            {/* Zoom Indicator */}
+            <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg px-3 py-1.5 border border-gray-200">
               <p className="text-xs text-gray-600 font-medium">
-                {Math.round(((12 - zoom) / 9) * 100)}% zoom
+                {zoomPercent}% zoom
               </p>
             </div>
           </>
         )}
 
-        {/* Toggle button for 2D view */}
+        {/* Toggle to 3D (when in 2D) */}
         {!isModelView && modelUrl && (
-          <div className="absolute top-4 right-4">
+          <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
             <button
               onClick={toggleView}
-              className="p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl hover:bg-white transition-all hover:scale-105 border border-gray-200 group"
+              className="p-2.5 sm:p-3 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-xl hover:bg-white transition-all hover:scale-105 border border-gray-200 group"
               title="Switch to 3D model"
             >
               <svg
@@ -533,9 +599,12 @@ export default function ProductViewer3D({
           </div>
         )}
 
-        {/* Product Info */}
-        <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg px-4 py-2.5 border border-gray-200">
-          <p className="text-sm font-semibold text-gray-900">{productName}</p>
+        {/* Product Info (responsive) */}
+        <div className="absolute top-3 left-3 sm:top-4 sm:left-4 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg px-3 sm:px-4 py-2 border border-gray-200 max-w-[75%]">
+          <p className="text-sm font-semibold text-gray-900 truncate">
+            {productName}
+          </p>
+
           {selectedColor && (
             <div className="flex items-center gap-2 mt-1.5">
               <div
@@ -547,6 +616,7 @@ export default function ProductViewer3D({
               </span>
             </div>
           )}
+
           {isModelView && modelUrl && (
             <div className="flex items-center gap-1.5 mt-1">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
@@ -562,9 +632,9 @@ export default function ProductViewer3D({
         </div>
       </div>
 
-      {/* Image Thumbnails */}
+      {/* Image Thumbnails (responsive) */}
       <div className="w-full">
-        <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+        <div className="bg-white rounded-lg border border-gray-200 p-3 sm:p-4 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
             <svg
               className="w-4 h-4 text-gray-600"
@@ -585,17 +655,15 @@ export default function ProductViewer3D({
             <span className="text-xs text-gray-500">({images.length})</span>
           </div>
 
-          <div className="grid grid-cols-4 gap-3">
+          {/* ✅ mobile: 3 cols, sm:4 cols, md:6 cols */}
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 sm:gap-3">
             {images.map((image, index) => (
               <button
                 key={index}
                 onClick={() => {
                   setCurrentImageIndex(index);
-
                   handleSelectedImage?.(image, index);
-                  if (modelUrl) {
-                    setIsModelView(false);
-                  }
+                  if (modelUrl) setIsModelView(false);
                 }}
                 className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${
                   !isModelView && currentImageIndex === index
@@ -639,7 +707,7 @@ export default function ProductViewer3D({
                 }`}
               >
                 <svg
-                  className="w-8 h-8 text-blue-600 mb-1"
+                  className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600 mb-1"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -651,11 +719,12 @@ export default function ProductViewer3D({
                     d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
                   />
                 </svg>
-                <span className="text-xs font-medium text-blue-600">
+                <span className="text-[11px] sm:text-xs font-medium text-blue-600">
                   3D View
                 </span>
+
                 {isModelView && (
-                  <div className="absolute inset-0 bg-blue-500/10 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-blue-500/10">
                     <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center absolute top-2 right-2">
                       <svg
                         className="w-4 h-4 text-white"

@@ -50,8 +50,6 @@ export default function Cart() {
   const [promoCode, setPromoCode] = useState("");
   const [promoError, setPromoError] = useState("");
   const [isApplyingPromo, setIsApplyingPromo] = useState(false);
-  const [removeOpen, setRemoveOpen] = useState(false);
-  const [removeLoading, setRemoveLoading] = useState(false);
   const [clearOpen, setClearOpen] = useState(false);
   const [clearLoading, setClearLoading] = useState(false);
 
@@ -66,7 +64,6 @@ export default function Cart() {
 
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    // validate using your existing function (based on current total without promo)
     const baseForPromo = subtotal - quantityDiscount;
     const result = validatePromoCode(promoCode, baseForPromo);
 
@@ -86,9 +83,7 @@ export default function Cart() {
     setIsApplyingPromo(false);
   };
 
-  const handleClearCart = () => {
-    setClearOpen(true);
-  };
+  const handleClearCart = () => setClearOpen(true);
 
   const confirmClearCart = async () => {
     setClearLoading(true);
@@ -104,10 +99,12 @@ export default function Cart() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-gray-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading your cart...</p>
+          <div className="w-14 h-14 sm:w-16 sm:h-16 border-4 border-gray-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600 text-sm sm:text-base">
+            Loading your cart...
+          </p>
         </div>
       </div>
     );
@@ -115,32 +112,37 @@ export default function Cart() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
-            <p className="text-gray-600 mt-1">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6 sm:mb-8">
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              Shopping Cart
+            </h1>
+            <p className="text-gray-600 mt-1 text-sm sm:text-base">
               {cartCount} {cartCount === 1 ? "item" : "items"} in your cart
             </p>
           </div>
 
-          {/* Sync Status */}
-          {syncStatus === "syncing" && (
-            <div className="flex items-center gap-2 text-sm text-blue-600">
-              <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-              <span>Syncing...</span>
-            </div>
-          )}
+          <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
+            {/* Sync Status */}
+            {syncStatus === "syncing" && (
+              <div className="flex items-center gap-2 text-sm text-blue-600">
+                <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                <span>Syncing...</span>
+              </div>
+            )}
 
-          {items.length > 0 && (
-            <button
-              onClick={handleClearCart}
-              className="px-4 py-2 text-red-600 border-red-300 border cursor pointer hover:bg-red-50 rounded-lg transition-colors"
-            >
-              Clear Cart
-            </button>
-          )}
+            {/* Clear cart button responsive */}
+            {items.length > 0 && (
+              <button
+                onClick={handleClearCart}
+                className="w-full sm:w-auto px-4 py-2 text-red-600 border border-red-300 cursor-pointer hover:bg-red-50 rounded-lg transition-colors text-sm font-medium"
+              >
+                Clear Cart
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Low Stock Warnings */}
@@ -158,16 +160,21 @@ export default function Cart() {
                   clipRule="evenodd"
                 />
               </svg>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-orange-900 mb-2">
                   Low Stock Alert
                 </h3>
-                {lowStockItems.map((item: any) => (
-                  <p key={item.id} className="text-sm text-orange-800">
-                    {item.productName}: Only {item.stock} left in stock (you
-                    requested {item.requested})
-                  </p>
-                ))}
+                <div className="space-y-1">
+                  {lowStockItems.map((item: any) => (
+                    <p
+                      key={item.id}
+                      className="text-sm text-orange-800 wrap-break-word"
+                    >
+                      {item.productName}: Only {item.stock} left in stock (you
+                      requested {item.requested})
+                    </p>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -188,15 +195,20 @@ export default function Cart() {
                   clipRule="evenodd"
                 />
               </svg>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-green-900 mb-2">
                   Bundle Deals Available! 🎉
                 </h3>
-                {bundleDiscounts.map((bundle, index) => (
-                  <p key={index} className="text-sm text-green-800">
-                    {bundle.name}
-                  </p>
-                ))}
+                <div className="space-y-1">
+                  {bundleDiscounts.map((bundle: any, index: number) => (
+                    <p
+                      key={index}
+                      className="text-sm text-green-800 wrap-break-word"
+                    >
+                      {bundle.name}
+                    </p>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -204,9 +216,9 @@ export default function Cart() {
 
         {/* Empty Cart */}
         {items.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+          <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
             <svg
-              className="w-24 h-24 text-gray-300 mx-auto mb-4"
+              className="w-20 h-20 sm:w-24 sm:h-24 text-gray-300 mx-auto mb-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -218,23 +230,23 @@ export default function Cart() {
                 d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
               />
             </svg>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
               Your cart is empty
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-6 text-sm sm:text-base">
               Add some products to get started!
             </p>
             <a
               href="/"
-              className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-block w-full sm:w-auto px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
             >
               Browse Products
             </a>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Cart Items */}
-            <div className="lg:col-span-2 space-y-4">
+            <div className="lg:col-span-2 space-y-4 min-w-0">
               {items.map((item) => (
                 <CartItem key={item.key} item={item} />
               ))}
@@ -242,32 +254,43 @@ export default function Cart() {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-4 space-y-6">
-                <h2 className="text-xl font-bold text-gray-900">
+              {/* ✅ on mobile: normal block, on lg+: sticky */}
+              <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 space-y-6 lg:sticky lg:top-4">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">
                   Order Summary
                 </h2>
 
                 {/* Price Breakdown */}
                 <div className="space-y-3 text-sm">
-                  <div className="flex justify-between text-gray-600">
-                    <span>Subtotal ({cartCount} items)</span>
-                    <span>৳{subtotal.toLocaleString()}</span>
+                  <div className="flex justify-between text-gray-600 gap-3">
+                    <span className="min-w-0 truncate">
+                      Subtotal ({cartCount} items)
+                    </span>
+                    <span className="shrink-0">
+                      ৳{subtotal.toLocaleString()}
+                    </span>
                   </div>
 
                   {quantityDiscount > 0 && (
-                    <div className="flex justify-between text-green-600 font-medium">
-                      <span>Quantity Discount</span>
-                      <span>-৳{quantityDiscount.toLocaleString()}</span>
+                    <div className="flex justify-between text-green-600 font-medium gap-3">
+                      <span className="min-w-0 truncate">
+                        Quantity Discount
+                      </span>
+                      <span className="shrink-0">
+                        -৳{quantityDiscount.toLocaleString()}
+                      </span>
                     </div>
                   )}
 
                   {appliedPromoCode && (
-                    <div className="flex justify-between text-blue-600 font-medium">
-                      <span className="flex items-center gap-1">
-                        Promo: {appliedPromoCode.code}
+                    <div className="flex justify-between text-blue-600 font-medium gap-3">
+                      <span className="flex items-center gap-1 min-w-0">
+                        <span className="truncate">
+                          Promo: {appliedPromoCode.code}
+                        </span>
                         <button
                           onClick={() => dispatch(removePromoCode())}
-                          className="text-red-500 hover:text-red-700"
+                          className="text-red-500 hover:text-red-700 shrink-0"
                           title="Remove promo"
                         >
                           <svg
@@ -283,13 +306,15 @@ export default function Cart() {
                           </svg>
                         </button>
                       </span>
-                      <span>-৳{promoDiscount.toLocaleString()}</span>
+                      <span className="shrink-0">
+                        -৳{promoDiscount.toLocaleString()}
+                      </span>
                     </div>
                   )}
 
-                  <div className="flex justify-between text-gray-600">
+                  <div className="flex justify-between text-gray-600 gap-3">
                     <span>Shipping</span>
-                    <span className="text-green-600 font-medium">
+                    <span className="text-green-600 font-medium shrink-0">
                       {total >= 20000 ? "FREE" : "৳100"}
                     </span>
                   </div>
@@ -301,7 +326,9 @@ export default function Cart() {
                     <label className="text-sm font-semibold text-gray-900">
                       Have a promo code?
                     </label>
-                    <div className="flex gap-2">
+
+                    {/* ✅ mobile: stack, sm+: row */}
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <input
                         type="text"
                         value={promoCode}
@@ -312,16 +339,17 @@ export default function Cart() {
                           e.key === "Enter" && handleApplyPromo()
                         }
                         placeholder="Enter code"
-                        className="flex-1 px-3 py-2 border border-gray-300 text-black rounded-lg focus:outline-none focus:border-blue-500 text-sm uppercase"
+                        className="w-full sm:flex-1 px-3 py-2 border border-gray-300 text-black rounded-lg focus:outline-none focus:border-blue-500 text-sm uppercase"
                       />
                       <button
                         onClick={handleApplyPromo}
                         disabled={isApplyingPromo || !promoCode.trim()}
-                        className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium disabled:opacity-50"
+                        className="w-full sm:w-auto px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium disabled:opacity-50"
                       >
                         {isApplyingPromo ? "Checking..." : "Apply"}
                       </button>
                     </div>
+
                     {promoError && (
                       <p className="text-xs text-red-600">{promoError}</p>
                     )}
@@ -338,7 +366,9 @@ export default function Cart() {
                       You save ৳{totalSavings.toLocaleString()}!
                     </p>
                   )}
-                  <div className="flex justify-between items-baseline">
+
+                  {/* ✅ mobile: stack, sm+: row */}
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-2">
                     <span className="text-lg font-bold text-gray-900">
                       Total
                     </span>
@@ -351,7 +381,7 @@ export default function Cart() {
                 {/* Checkout Button */}
                 <Link
                   href={"/checkout"}
-                  className="w-full block text-center py-4 bg-gray-700 hover:bg-gray-900 cursor-pointer text-white font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl"
+                  className="w-full block text-center py-3 sm:py-4 bg-gray-700 hover:bg-gray-900 cursor-pointer text-white font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl"
                 >
                   Proceed to Checkout
                 </Link>
@@ -369,11 +399,11 @@ export default function Cart() {
 
         {/* Saved for Later */}
         {savedForLater.length > 0 && (
-          <div className="mt-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          <div className="mt-10 sm:mt-12">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
               Saved for Later ({savedForLater.length})
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {savedForLater.map((item) => (
                 <SavedForLaterItem key={item.key} item={item} />
               ))}

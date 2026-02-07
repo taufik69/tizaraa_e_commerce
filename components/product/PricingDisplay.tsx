@@ -273,7 +273,7 @@ export default function PricingDisplay({
 
       {/* Total */}
       <div className="pt-4 border-t-2 border-gray-900">
-        {/* ✅ mobile: stacks, sm+: side-by-side */}
+        {/*  mobile: stacks, sm+: side-by-side */}
         <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-baseline mb-2">
           <span className="text-lg font-bold text-gray-900">Total</span>
 

@@ -124,10 +124,10 @@ export default function ProductConfigurator({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          {/* ✅ responsive header row */}
+          {/*  responsive header row */}
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between mb-4">
             <div className="min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 break-words">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 wrap-break-word">
                 {product.name}
               </h1>
               <p className="text-gray-600 mt-2 text-sm sm:text-base">
@@ -160,7 +160,7 @@ export default function ProductConfigurator({
               </div>
             </div>
 
-            {/* ✅ Share Button stays usable on mobile */}
+            {/*  Share Button stays usable on mobile */}
             <button
               onClick={() => setShowShareModal(true)}
               className="cursor-pointer inline-flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors w-full sm:w-auto"
