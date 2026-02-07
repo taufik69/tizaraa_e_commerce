@@ -105,7 +105,7 @@ export default function PricingDisplay({
   };
 
   return (
-    // ✅ Responsive wrapper:
+    //  Responsive wrapper:
     // - mobile: normal block (no sticky)
     // - lg+: sticky sidebar card
     <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 space-y-5 sm:space-y-6 lg:sticky lg:top-4">
@@ -113,7 +113,7 @@ export default function PricingDisplay({
       <div className="space-y-3">
         <label className="text-sm font-semibold text-gray-900">Quantity</label>
 
-        {/* ✅ Responsive layout:
+        {/*  Responsive layout:
             - mobile: buttons & input wrap nicely
             - sm+: keep in one row
         */}
@@ -147,7 +147,7 @@ export default function PricingDisplay({
               const val = parseInt(e.target.value) || 1;
               onQuantityChange(Math.max(1, Math.min(999, val)));
             }}
-            // ✅ better on small screens
+            //  better on small screens
             className="w-20 sm:w-24 h-10 text-center text-lg cursor-pointer font-semibold border-2 text-black border-gray-900 rounded-lg focus:border-blue-500 focus:outline-none"
           />
 
