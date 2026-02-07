@@ -122,42 +122,47 @@ export default function CartItem({ item }: CartItemProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <div className="flex gap-6">
+    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+      {/* ✅ Mobile: stack | Desktop: row */}
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
         {/* Product Image */}
-        <div className="w-32 h-32 shrink-0 bg-gray-100 rounded-lg overflow-hidden">
-          {item?.selectedImage == null ? (
-            <img
-              src={product.images[0]}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            product.images.map((image, index) =>
-              index === item?.selectedImage?.index ? (
-                <img
-                  key={index}
-                  src={image}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : null,
-            )
-          )}
+        <div className="w-full sm:w-32 sm:h-32 shrink-0">
+          <div className="w-full aspect-square sm:w-32 sm:h-32 bg-gray-100 rounded-lg overflow-hidden">
+            {item?.selectedImage == null ? (
+              <img
+                src={product.images[0]}
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              product.images.map((image, index) =>
+                index === item?.selectedImage?.index ? (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : null,
+              )
+            )}
+          </div>
         </div>
 
         {/* Product Details */}
-        <div className="flex-1">
-          <div className="flex justify-between items-start mb-3">
-            <div>
-              <h3 className="font-bold text-gray-900 text-lg mb-1">
+        <div className="flex-1 min-w-0">
+          {/* Title Row */}
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div className="min-w-0">
+              <h3 className="font-bold text-gray-900 text-base sm:text-lg mb-1 truncate">
                 {product.name}
               </h3>
-              <p className="text-sm text-gray-600">{product.brand}</p>
+              <p className="text-sm text-gray-600 truncate">{product.brand}</p>
             </div>
+
             <button
               onClick={() => setRemoveOpen(true)}
-              className="text-gray-400 hover:text-red-600 transition-colors"
+              className="shrink-0 text-gray-400 hover:text-red-600 transition-colors"
               title="Remove from cart"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -171,18 +176,18 @@ export default function CartItem({ item }: CartItemProps) {
           </div>
 
           {/* Variant Info */}
-          <div className="flex flex-wrap gap-3 mb-4 text-sm text-gray-600">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 text-sm text-gray-600">
             <div className="flex items-center gap-1">
               <span
                 className="w-4 h-4 rounded-full border"
                 style={{ backgroundColor: colorVariant?.hex }}
               />
-              <span>{colorVariant?.name}</span>
+              <span className="truncate max-w-35">{colorVariant?.name}</span>
             </div>
-            <span>•</span>
-            <span>{materialVariant?.name}</span>
-            <span>•</span>
-            <span>{sizeVariant?.name}</span>
+            <span className="text-gray-300">•</span>
+            <span className="truncate max-w-40">{materialVariant?.name}</span>
+            <span className="text-gray-300">•</span>
+            <span className="truncate max-w-40">{sizeVariant?.name}</span>
           </div>
 
           {/* Stock Warning */}
@@ -205,13 +210,14 @@ export default function CartItem({ item }: CartItemProps) {
             </div>
           )}
 
-          {/* Quantity Selector and Price */}
-          <div className="flex items-center justify-between">
+          {/* ✅ Controls + Price responsive */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            {/* Quantity */}
             <div className="flex items-center gap-3">
               <button
                 onClick={() => handleQuantityChange(item.quantity - 1)}
                 disabled={item.quantity <= 1 || isUpdating}
-                className="w-8 h-8 rounded-lg border-2 border-gray-900 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-40 text-black"
+                className="w-9 h-9 sm:w-8 sm:h-8 rounded-lg border-2 border-gray-900 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-40 text-black"
               >
                 <svg
                   className="w-4 h-4"
@@ -238,13 +244,13 @@ export default function CartItem({ item }: CartItemProps) {
                   handleQuantityChange(Math.max(1, Math.min(999, val)));
                 }}
                 disabled={isUpdating}
-                className="w-16 h-8 text-center font-semibold border-2 border-gray-900 text-black rounded-lg focus:border-blue-500 focus:outline-none"
+                className="w-20 sm:w-16 h-9 sm:h-8 text-center font-semibold border-2 border-gray-900 text-black rounded-lg focus:border-blue-500 focus:outline-none"
               />
 
               <button
                 onClick={() => handleQuantityChange(item.quantity + 1)}
                 disabled={isUpdating || item.quantity >= minStock}
-                className="w-8 h-8 rounded-lg border-2 border-gray-900 text-black flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-40"
+                className="w-9 h-9 sm:w-8 sm:h-8 rounded-lg border-2 border-gray-900 text-black flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-40"
               >
                 <svg
                   className="w-4 h-4"
@@ -260,15 +266,23 @@ export default function CartItem({ item }: CartItemProps) {
                   />
                 </svg>
               </button>
+
+              {isUpdating && (
+                <span className="text-xs text-gray-500 flex items-center gap-2">
+                  <span className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                  Updating...
+                </span>
+              )}
             </div>
 
-            <div className="text-right">
+            {/* Price */}
+            <div className="text-left sm:text-right">
               {discount > 0 && (
                 <p className="text-sm text-gray-500 line-through">
                   ৳{subtotal.toLocaleString()}
                 </p>
               )}
-              <p className="text-xl font-bold text-gray-900">
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">
                 ৳{itemTotal.toLocaleString()}
               </p>
               <p className="text-xs text-gray-500">
@@ -277,11 +291,11 @@ export default function CartItem({ item }: CartItemProps) {
             </div>
           </div>
 
-          {/* Save for Later Button */}
-          <div className="mt-4 pt-4 border-t flex justify-between items-center">
+          {/* Footer Actions */}
+          <div className="mt-4 pt-4 border-t flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
             <button
               onClick={handleSaveForLater}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium w-fit"
             >
               Save for Later
             </button>
