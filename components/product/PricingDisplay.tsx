@@ -2,13 +2,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { Product } from "@/data/mockData";
+import type { Product } from "@/data/mockData";
 import { useAppDispatch } from "@/features/store/hooks/hooks";
 import {
   addToCartAsync,
   optimisticAddToCart,
 } from "@/features/slices/cartSlice";
-import Link from "next/link";
 
 interface PricingDisplayProps {
   product: Product;
@@ -54,7 +53,6 @@ export default function PricingDisplay({
 
   const configuratedPrice =
     basePrice + colorModifier + materialModifier + sizeModifier;
-
   const subtotal = configuratedPrice * quantity;
 
   // Quantity discount
@@ -93,13 +91,10 @@ export default function PricingDisplay({
         },
         quantity,
         addedAt: new Date().toISOString(),
-        selectedImage, // ✅ persist selected image
+        selectedImage,
       };
 
-      // Optimistic update
       dispatch(optimisticAddToCart(cartItem as any));
-
-      // Actual async operation
       await dispatch(addToCartAsync(cartItem as any)).unwrap();
     } catch (error) {
       console.error("Failed to add to cart:", error);
@@ -110,12 +105,19 @@ export default function PricingDisplay({
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6 sticky top-4">
+    // ✅ Responsive wrapper:
+    // - mobile: normal block (no sticky)
+    // - lg+: sticky sidebar card
+    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 space-y-5 sm:space-y-6 lg:sticky lg:top-4">
       {/* Quantity Selector */}
       <div className="space-y-3">
-        <label className="text-sm font-semibold text-gray-900 ">Quantity</label>
+        <label className="text-sm font-semibold text-gray-900">Quantity</label>
 
-        <div className="flex items-center gap-3 mt-3">
+        {/* ✅ Responsive layout:
+            - mobile: buttons & input wrap nicely
+            - sm+: keep in one row
+        */}
+        <div className="flex flex-wrap items-center gap-3 mt-3">
           <button
             onClick={() => quantity > 1 && onQuantityChange(quantity - 1)}
             className="w-10 h-10 rounded-lg border-2 border-gray-900 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-40 text-black cursor-pointer"
@@ -145,7 +147,8 @@ export default function PricingDisplay({
               const val = parseInt(e.target.value) || 1;
               onQuantityChange(Math.max(1, Math.min(999, val)));
             }}
-            className="w-20 h-10 text-center text-lg cursor-pointer font-semibold border-2 text-black border-gray-900 rounded-lg focus:border-blue-500 focus:outline-none"
+            // ✅ better on small screens
+            className="w-20 sm:w-24 h-10 text-center text-lg cursor-pointer font-semibold border-2 text-black border-gray-900 rounded-lg focus:border-blue-500 focus:outline-none"
           />
 
           <button
@@ -196,67 +199,73 @@ export default function PricingDisplay({
         <h3 className="text-sm font-semibold text-gray-900">Price Breakdown</h3>
 
         <div className="space-y-2 text-sm">
-          <div className="flex justify-between text-gray-600">
-            <span>Base Price</span>
-            <span>৳{basePrice.toLocaleString()}</span>
+          <div className="flex justify-between text-gray-600 gap-3">
+            <span className="shrink-0">Base Price</span>
+            <span className="font-medium text-gray-900">
+              ৳{basePrice.toLocaleString()}
+            </span>
           </div>
 
           {colorModifier !== 0 && (
-            <div className="flex justify-between text-gray-600">
-              <span className="flex items-center gap-1">
+            <div className="flex justify-between text-gray-600 gap-3">
+              <span className="flex items-center gap-2 min-w-0">
                 <span
-                  className="w-3 h-3 rounded-full border"
+                  className="w-3 h-3 rounded-full border shrink-0"
                   style={{ backgroundColor: colorVariant?.hex }}
                 />
-                {colorVariant?.name}
+                <span className="truncate">{colorVariant?.name}</span>
               </span>
-              <span className="text-green-600">
+              <span className="text-green-600 shrink-0">
                 +৳{colorModifier.toLocaleString()}
               </span>
             </div>
           )}
 
           {materialModifier !== 0 && (
-            <div className="flex justify-between text-gray-600">
-              <span>{materialVariant?.name}</span>
-              <span className="text-green-600">
+            <div className="flex justify-between text-gray-600 gap-3">
+              <span className="truncate">{materialVariant?.name}</span>
+              <span className="text-green-600 shrink-0">
                 +৳{materialModifier.toLocaleString()}
               </span>
             </div>
           )}
 
           {sizeModifier !== 0 && (
-            <div className="flex justify-between text-gray-600">
-              <span>{sizeVariant?.name}</span>
+            <div className="flex justify-between text-gray-600 gap-3">
+              <span className="truncate">{sizeVariant?.name}</span>
               <span
-                className={
-                  sizeModifier > 0 ? "text-green-600" : "text-orange-600"
-                }
+                className={`${sizeModifier > 0 ? "text-green-600" : "text-orange-600"} shrink-0`}
               >
                 {sizeModifier > 0 ? "+" : ""}৳{sizeModifier.toLocaleString()}
               </span>
             </div>
           )}
 
-          <div className="flex justify-between font-medium text-gray-900 pt-2 border-t">
-            <span>Unit Price</span>
-            <span>৳{configuratedPrice.toLocaleString()}</span>
+          <div className="flex justify-between font-medium text-gray-900 pt-2 border-t gap-3">
+            <span className="shrink-0">Unit Price</span>
+            <span className="shrink-0">
+              ৳{configuratedPrice.toLocaleString()}
+            </span>
           </div>
 
-          <div className="flex justify-between text-gray-600">
-            <span>Quantity</span>
-            <span>× {quantity}</span>
+          <div className="flex justify-between text-gray-600 gap-3">
+            <span className="shrink-0">Quantity</span>
+            <span className="shrink-0">× {quantity}</span>
           </div>
 
-          <div className="flex justify-between font-medium text-gray-900">
-            <span>Subtotal</span>
-            <span>৳{subtotal.toLocaleString()}</span>
+          <div className="flex justify-between font-medium text-gray-900 gap-3">
+            <span className="shrink-0">Subtotal</span>
+            <span className="shrink-0">৳{subtotal.toLocaleString()}</span>
           </div>
 
           {quantityDiscount > 0 && (
-            <div className="flex justify-between text-green-600 font-medium">
-              <span>Quantity Discount ({quantityDiscountPercent}%)</span>
-              <span>-৳{quantityDiscount.toLocaleString()}</span>
+            <div className="flex justify-between text-green-600 font-medium gap-3">
+              <span className="min-w-0 truncate">
+                Quantity Discount ({quantityDiscountPercent}%)
+              </span>
+              <span className="shrink-0">
+                -৳{quantityDiscount.toLocaleString()}
+              </span>
             </div>
           )}
         </div>
@@ -264,9 +273,11 @@ export default function PricingDisplay({
 
       {/* Total */}
       <div className="pt-4 border-t-2 border-gray-900">
-        <div className="flex justify-between items-baseline mb-2">
+        {/* ✅ mobile: stacks, sm+: side-by-side */}
+        <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-baseline mb-2">
           <span className="text-lg font-bold text-gray-900">Total</span>
-          <div className="text-right">
+
+          <div className="sm:text-right">
             {quantityDiscount > 0 && (
               <p className="text-sm text-green-600 font-medium mb-1">
                 You save ৳{quantityDiscount.toLocaleString()}!
@@ -281,7 +292,7 @@ export default function PricingDisplay({
 
       {/* Add to Cart Button */}
       <button
-        className="w-full py-4 bg-gray-800 hover:bg-gray-700 cursor-pointer text-white font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full py-3 sm:py-4 bg-gray-800 hover:bg-gray-700 cursor-pointer text-white font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={handleAddToCart}
         disabled={isAddingToCart}
       >
