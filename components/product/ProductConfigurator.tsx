@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, lazy } from "react";
-import { Product } from "@/data/mockData";
+import type { Product } from "@/data/mockData";
 import VariantSelector from "./VariantSelector";
 import PricingDisplay from "./PricingDisplay";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -44,7 +44,8 @@ export default function ProductConfigurator({
   const [shareUrl, setShareUrl] = useState("");
   const [showShareModal, setShowShareModal] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
-  const [selectedImage, setselectedImage] = useState({
+
+  const [selectedImage, setSelectedImage] = useState({
     image: "null",
     index: 0,
   });
@@ -52,19 +53,13 @@ export default function ProductConfigurator({
   // Update URL when configuration changes
   useEffect(() => {
     const params = new URLSearchParams();
-
     params.set("color", selectedVariants.color);
     params.set("material", selectedVariants.material);
     params.set("size", selectedVariants.size);
-    if (quantity > 1) {
-      params.set("qty", quantity.toString());
-    }
+    if (quantity > 1) params.set("qty", quantity.toString());
 
-    // Update URL without page reload
     const newUrl = `${window.location.pathname}?${params.toString()}`;
     window.history.replaceState({}, "", newUrl);
-
-    // Generate shareable URL
     setShareUrl(`${window.location.origin}${newUrl}`);
   }, [selectedVariants, quantity]);
 
@@ -73,6 +68,7 @@ export default function ProductConfigurator({
     if (!product.id) return;
     dispatch(addRecentlyViewedAsync(product.id));
   }, [dispatch, product.id]);
+
   const handleVariantChange = (
     type: "color" | "material" | "size",
     variantId: string,
@@ -120,31 +116,31 @@ export default function ProductConfigurator({
 
   // handle selected image index
   const handleSelectedImage = (image: string, index: number) => {
-    setselectedImage({
-      image,
-      index,
-    });
+    setSelectedImage({ image, index });
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+        <div className="mb-6 sm:mb-8">
+          {/* ✅ responsive header row */}
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between mb-4">
+            <div className="min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 break-words">
                 {product.name}
               </h1>
-              <p className="text-gray-600 mt-2">{product.description}</p>
+              <p className="text-gray-600 mt-2 text-sm sm:text-base">
+                {product.description}
+              </p>
 
               {/* Rating */}
-              <div className="flex items-center gap-2 mt-3">
+              <div className="flex flex-wrap items-center gap-2 mt-3">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
                     <svg
                       key={i}
-                      className={`w-5 h-5 ${
+                      className={`w-4 h-4 sm:w-5 sm:h-5 ${
                         i < Math.floor(product.rating)
                           ? "text-yellow-400"
                           : "text-gray-300"
@@ -156,17 +152,18 @@ export default function ProductConfigurator({
                     </svg>
                   ))}
                 </div>
-                <span className="text-sm text-gray-600">
+
+                <span className="text-xs sm:text-sm text-gray-600">
                   {product.rating} ({product.reviewCount.toLocaleString()}{" "}
                   reviews)
                 </span>
               </div>
             </div>
 
-            {/* Share Button */}
+            {/* ✅ Share Button stays usable on mobile */}
             <button
               onClick={() => setShowShareModal(true)}
-              className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="cursor-pointer inline-flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors w-full sm:w-auto"
             >
               <svg
                 className="w-5 h-5 text-gray-600"
@@ -185,8 +182,8 @@ export default function ProductConfigurator({
             </button>
           </div>
 
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-gray-600">
+          {/* Breadcrumb (wraps on small screens) */}
+          <nav className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:text-sm text-gray-600">
             <a href="/" className="hover:text-gray-900">
               Home
             </a>
@@ -195,18 +192,20 @@ export default function ProductConfigurator({
               Products
             </a>
             <span>/</span>
-            <span className="text-gray-900 font-medium">{product.name}</span>
+            <span className="text-gray-900 font-medium wrap-break-word">
+              {product.name}
+            </span>
           </nav>
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - 3D Viewer */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          {/* Left Column - 3D Viewer + Variants */}
           <div className="lg:col-span-2 space-y-6">
             {/* 3D Viewer */}
             <React.Suspense
               fallback={
-                <div className="w-full h-125 bg-gray-100 rounded-xl flex items-center justify-center">
+                <div className="w-full h-80 sm:h-105 lg:h-130 bg-gray-100 rounded-xl flex items-center justify-center">
                   <div className="text-center">
                     <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
                     <p className="text-gray-600">Loading 3D Preview...</p>
@@ -225,8 +224,8 @@ export default function ProductConfigurator({
             </React.Suspense>
 
             {/* Variant Selector */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">
+            <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">
                 Customize Your Product
               </h2>
               <VariantSelector
@@ -253,10 +252,10 @@ export default function ProductConfigurator({
       {/* Share Modal */}
       {showShareModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-6">
+          <div className="bg-white rounded-2xl w-full max-w-md p-5 sm:p-6 space-y-6">
             {/* Modal Header */}
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl font-bold text-gray-900">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900">
                 Share Configuration
               </h3>
               <button
@@ -282,16 +281,18 @@ export default function ProductConfigurator({
               <label className="text-sm font-medium text-gray-700">
                 Share Link
               </label>
-              <div className="flex gap-2">
+
+              {/* ✅ mobile: stack input + button, sm+: row */}
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   value={shareUrl}
                   readOnly
-                  className="flex-1 px-3 py-2 bg-gray-50 text-black border border-gray-300 rounded-lg text-sm"
+                  className="w-full sm:flex-1 px-3 py-2 bg-gray-50 text-black border border-gray-300 rounded-lg text-sm truncate"
                 />
                 <button
                   onClick={handleCopyShareUrl}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  className={`w-full sm:w-auto px-4 py-2 rounded-lg font-medium transition-colors ${
                     copySuccess
                       ? "bg-green-600 text-white"
                       : "bg-gray-900 text-white hover:bg-gray-800"
@@ -307,7 +308,9 @@ export default function ProductConfigurator({
               <label className="text-sm font-medium text-gray-700">
                 Share Via
               </label>
-              <div className="grid grid-cols-2 gap-3">
+
+              {/* ✅ mobile: 1 col, sm+: 2 col */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   onClick={handleShareViaWhatsApp}
                   className="flex items-center justify-center gap-2 px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
@@ -349,7 +352,9 @@ export default function ProductConfigurator({
               <p className="text-sm font-medium text-gray-700">
                 Your Configuration:
               </p>
-              <div className="grid grid-cols-3 gap-2 text-xs">
+
+              {/* ✅ mobile: 1 col, sm+: 3 col */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
                 <div className="bg-gray-50 p-2 rounded">
                   <p className="text-gray-500">Color</p>
                   <p className="font-medium text-gray-900">
@@ -368,6 +373,14 @@ export default function ProductConfigurator({
                 </div>
               </div>
             </div>
+
+            {/* Close button (nice on mobile) */}
+            <button
+              onClick={() => setShowShareModal(false)}
+              className="w-full sm:hidden py-3 rounded-lg border border-gray-300 text-gray-900 hover:bg-gray-50 transition-colors"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
